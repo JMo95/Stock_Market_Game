@@ -1,16 +1,26 @@
-// import logo from './logo.svg';
+import React from "react";
 
+class search extends React.Component
+{
+  constructor(props) 
+  {
+    super(props);
+  };
 
-function search() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <p>
-          Search
-        </p>
-      </header>
-    </div>
-  );
+  render()
+  {
+    return (
+      <div className="App">
+        <header className="App-header">
+          <p>
+            Search
+            Something is happening
+          </p>
+        </header>
+      </div>
+    );
+  }
 }
 
 export default search;
+
