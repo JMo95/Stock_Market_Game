@@ -1,7 +1,7 @@
 import React from "react";
 
 
-class landing extends React.Component
+class User extends React.Component
 {
         constructor(props) 
         {
@@ -14,7 +14,7 @@ class landing extends React.Component
                 <div className="App">
                   <header className="App-header">
                     <p>
-                      Landing page.
+                      User page.
                     </p>
                   </header>
                 </div>
@@ -22,4 +22,4 @@ class landing extends React.Component
         }
 }
 
-export default landing;
+export default User;

@@ -8,6 +8,7 @@ import Nav from './Nav';
 
 import landing from "./Component/Landing";
 import search from "./Component/Search";
+import userX from "./Component/User";
 //import { AuthProvider } from './components/Auth';
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
                   <Route path="/" exact component={landing} />
                   <Route path="/Landing" component={landing} />
                   <Route path="/Search" component={search} />
+                  <Route path="/User" component={userX} />
               </Switch>
             </div>  
         </div>

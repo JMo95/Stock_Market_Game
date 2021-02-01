@@ -48,3 +48,24 @@
     transform: rotate(360deg);
   }
 }
+
+
+.hole
+{
+    width: 20px;
+    height: 20px;
+}
+
+.hole2
+{
+    margin-left: 5px;
+    width: 2%;
+    display: inline-block;
+}
+
+.hole3
+{
+    margin-left: 4px;
+    /* width: 2%; */
+    display: inline-block;
+}
