@@ -1,6 +1,6 @@
 import './css/Nav.css';
-import React, { Component }  from "react";
-import Image from 'react-image-resizer';
+// import React, { Component }  from "react";
+// import Image from 'react-image-resizer';
 import logo from "./Image/BUTTON_search.png"
 import profile from "./Image/Profile.png"
 import pictureX from "./Image/PICTURE.png"
@@ -37,8 +37,11 @@ const Nav = () => {
         <div className="Nav_Base">
             
         </div>
-          
+        <form className="Nav_Base">
+          <input className="Nav_Base" type="text"  placeholder = "Seach ...."  name="name"  />
+        </form>
         <img src={logo} className="Nav_Icon" align='center' onClick={()=> handleClick_Search()} />
+        
         <div className="hole3"> </div>
         <img src={[profile]} className="Nav_Icon" align='right' onClick={()=> handleClick_User()}  />
 

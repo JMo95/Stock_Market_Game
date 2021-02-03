@@ -5,7 +5,7 @@ class landing extends React.Component
 {
         constructor(props) 
         {
-                super(props);
+                super(props)
         }
 
         render()
@@ -14,7 +14,7 @@ class landing extends React.Component
                 <div className="App">
                   <header className="App-header">
                     <p>
-                      Landing page.
+                      Login page.
                     </p>
                   </header>
                 </div>

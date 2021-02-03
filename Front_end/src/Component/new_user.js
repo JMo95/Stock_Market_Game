@@ -14,7 +14,7 @@ class landing extends React.Component
                 <div className="App">
                   <header className="App-header">
                     <p>
-                      Landing page.
+                      New User.
                     </p>
                   </header>
                 </div>

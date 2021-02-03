@@ -5,7 +5,7 @@ class search extends React.Component
   constructor(props) 
   {
     super(props);
-  };
+  }
 
   render()
   {
