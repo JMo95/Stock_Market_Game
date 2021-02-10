@@ -1,3 +1,6 @@
+from django.shortcuts import render 
+from json import dumps
+
 import sys
 import re
 
@@ -56,12 +59,13 @@ def scrape(abbr):
         i+=1
 
     return fields
+    #return render(abbr, 'Front_end/search.html', fields)
 
-if __name__ == "__main__":
+"""if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("ERROR: Expecting 1 command line argument")
         exit()
 
     summary = scrape(sys.argv[1])
     for s in summary:
-        print(s)
+        print(s)"""
