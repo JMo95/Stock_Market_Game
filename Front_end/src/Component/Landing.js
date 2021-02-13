@@ -8,11 +8,37 @@ class landing extends React.Component
 {
         constructor(props) 
         {
-                super(props);
+          super(props);
         }
+
+
+        handleClick_Search2 = () =>
+          {
+            console.log("OpertionX");
+            window.location.href = '/search';
+          }
+
+        handleClick_Sign_in = () =>
+          {
+            console.log("Opertion_Sign");
+            window.location.href = '/Log_in';
+          }
+
+        handleClick_Regsiter = () =>
+          {
+            console.log("Opertion_Reg");
+            window.location.href = '/Register';
+          }
+
 
         render()
         {
+          var handleClick_Search = () =>
+          {
+            console.log("Opertion2");
+            window.location.href = '/search';
+          }
+
           return (
                 <div className="App">
                   <header className="App-header">
@@ -35,7 +61,7 @@ class landing extends React.Component
                     <div className="land_box">   
                       <div className="land_box2">
                         <h2 className="land_text"> Search </h2>
-                        <img src={[search_p]} className="land_Icon" align='center'  />
+                        <img src={[search_p]} className="land_Icon" align='center' onClick={()=> this.handleClick_Search2()} />
                         <p className="land_text"> --------- </p>
                         <form className="Nav_Base">
                           <input className="Nav_Base" type="text"  placeholder = "Seach ...."  name="name"  />
@@ -44,8 +70,8 @@ class landing extends React.Component
                       <div className="land_hole2"> </div>
                       <div className="land_box2">
                         <h2 className="land_text"> User </h2>
-                        <div className="land_box3" style = { { display: 'center' }} > REGISTER </div>
-                        <div className="land_box3"  display='center' > SIGN UP </div>
+                        <div className="land_box3" style = { { display: 'center' }} onClick={()=> this.handleClick_Regsiter()} > REGISTER </div>
+                        <div className="land_box3"  display='center' onClick={()=> this.handleClick_Sign_in()} > SIGN UP </div>
                       </div>
                     </div>
 

@@ -5,6 +5,10 @@ class search extends React.Component
   constructor(props) 
   {
     super(props);
+    this.state = { 
+      search_for: ''
+  };
+
   }
 
   render()
@@ -15,6 +19,10 @@ class search extends React.Component
           <p>
             Search
             Something is happening
+          </p>
+
+          <p>
+            Buscando {this.props.Input}
           </p>
         </header>
       </div>

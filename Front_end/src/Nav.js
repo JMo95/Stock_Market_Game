@@ -11,7 +11,37 @@ class Nav extends React.Component
 
   constructor(props) 
         {
-                super(props);
+          super(props);
+          this.state ={
+            search_A: ''
+          };
+
+          this.handle_Change = this.handle_Change.bind(this);
+          this.handleSubmit = this.handleSubmit.bind(this);
+        }
+
+        handle_Change(event)
+         {
+            console.log("Opertion4");
+            this.setState( (state, props) =>{
+              return{
+                search_A: event.target.value
+              };
+            }
+            )
+            console.log(this.state.search_A)
+            this.props.search_F(this.state.search_A);
+        }
+
+
+        handleSubmit(event)
+         {
+          event.preventDefault();
+            console.log("Submit happen");
+            console.log(this.state.search_A);
+            this.props.search_F(this.state.search_A);
+            alert('A value was submitted: ' + this.state.search_A);
+            window.location.href = '/search';
         }
 
         render()
@@ -26,6 +56,8 @@ class Nav extends React.Component
           var handleClick_Search = () =>
           {
             console.log("Opertion2");
+            // this.props.search_F("megaman");
+            // console.log(this.props.search_F2);
             window.location.href = '/search';
           }
 
@@ -45,8 +77,8 @@ class Nav extends React.Component
                 <div className="Nav_Base">
                     
                 </div>
-                <form className="Nav_Base">
-                  <input className="Nav_Base" type="text"  placeholder = "Seach ...."  name="name"  />
+                <form className="Nav_Base" onSubmit={this.handleSubmit} >
+                  <input className="Nav_Base" type="text"  placeholder = "Seach ...."  name="name"  value={this.state.search_A} onChange={this.handle_Change} />
                 </form>
                 <img src={logo} className="Nav_Icon" align='center' onClick={()=> handleClick_Search()} />
                 
