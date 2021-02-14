@@ -13,7 +13,8 @@ class Nav extends React.Component
         {
           super(props);
           this.state ={
-            search_A: ''
+            search_A: '',
+            user_hello: false
           };
 
           this.handle_Change = this.handle_Change.bind(this);
@@ -64,7 +65,20 @@ class Nav extends React.Component
           var handleClick_User = () =>
           {
             console.log("Opertion3");
-            window.location.href = '/user';
+            if (this.state.user_hello == true)
+            {
+                this.setState({
+                  user_hello: false
+                })
+            }
+            else
+            {
+              this.setState({
+                user_hello: true
+              })
+            }
+            //window.location.href = '/user';
+            console.log("this is boolean: ", this.state.user_hello);
           }
 
             return (
@@ -84,6 +98,16 @@ class Nav extends React.Component
                 
                 <div className="hole3"> </div>
                 <img src={[profile]} className="Nav_Icon" align='right' onClick={()=> handleClick_User()}  />
+                
+                {(() => {
+              if (this.state.user_hello == true){
+                  return (
+                      <div>hello</div>
+                  )
+              }
+              
+              return null;
+            })()}
 
               </div>
             );

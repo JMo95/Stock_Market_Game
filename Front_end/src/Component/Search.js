@@ -6,10 +6,26 @@ class search extends React.Component
   {
     super(props);
     this.state = { 
-      search_for: ''
+      search_for: this.props.Input,
+      search_for_dynamic: ''
   };
 
+
+  this.handle_Change = this.handle_Change.bind(this);
   }
+
+
+  handle_Change(event)
+  {
+            console.log("Opertion55");
+            this.setState( (state, props) =>{
+              return{
+                search_for_dynamic: event.target.value
+              };
+            }
+            )
+  }
+
 
   render()
   {
@@ -21,8 +37,12 @@ class search extends React.Component
             Something is happening
           </p>
 
+          <form className="Nav_Base" onSubmit={this.handleSubmit} >
+            <input className="Nav_Base" type="text"  placeholder = "Seach ...."  name="name"  value={this.props.search_for_dynamic} onChange={this.handle_Change} />
+          </form>
+
           <p>
-            Buscando {this.props.Input}
+            Looking for {this.state.search_for_dynamic}
           </p>
         </header>
       </div>

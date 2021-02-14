@@ -25,6 +25,7 @@ class App extends React.Component
   }
 
   handleSearch = (search_Data) =>{
+    //this function is pass to the children to modify original search_for
     this.setState({search_for: search_Data})
     console.log(this.state.search_for)
   }
