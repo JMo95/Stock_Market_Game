@@ -33,6 +33,7 @@ ALLOWED_HOSTS = ['stonk-price-predictor.herokuapp.com','127.0.0.1']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
+    'users.apps.UsersConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -78,7 +79,8 @@ WSGI_APPLICATION = 'Back_end.wsgi.application'
 DATABASES = {
 
     'default': {
-
+            
+         
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
 
         'NAME': 'db87r0ljsrbis2',
@@ -90,8 +92,23 @@ DATABASES = {
         'HOST': 'ec2-34-192-106-123.compute-1.amazonaws.com',
 
         'PORT': '5432',
+        
+        'TEST': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
 
-    }
+        'NAME': 'db87r0ljsrbis2',
+
+        'USER': 'inuyomyznpbggc',
+
+        'PASSWORD': 'fb6e7f1e31dce8075c2f30920904ed633984b8f3dba836eab060ec62c3fbaed1',
+
+        'HOST': 'ec2-34-192-106-123.compute-1.amazonaws.com',
+
+        'PORT': '5432',
+        },
+
+    },
+   
 
 }
 
