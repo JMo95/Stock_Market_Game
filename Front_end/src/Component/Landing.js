@@ -30,6 +30,13 @@ class landing extends React.Component
             window.location.href = '/Register';
           }
 
+          handleSubmit_search(event)
+         {
+          event.preventDefault();
+            console.log("Submit happen");
+            alert('A value was submitted: ');
+            window.location.href = '/search';
+        }
 
         render()
         {
@@ -38,6 +45,8 @@ class landing extends React.Component
             console.log("Opertion2");
             window.location.href = '/search';
           }
+
+          
 
           return (
                 <div className="App">
@@ -63,7 +72,7 @@ class landing extends React.Component
                         <h2 className="land_text"> Search </h2>
                         <img src={[search_p]} className="land_Icon" align='center' onClick={()=> this.handleClick_Search2()} />
                         <p className="land_text"> --------- </p>
-                        <form className="Nav_Base">
+                        <form className="Nav_Base" onSubmit={this.handleSubmit_search}>
                           <input className="Nav_Base" type="text"  placeholder = "Seach ...."  name="name"  />
                         </form>
                       </div>

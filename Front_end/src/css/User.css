@@ -1,5 +1,5 @@
 
-.land_box
+.user_box
 {
     width: 100%;
     height: 60%;
@@ -13,13 +13,22 @@
 }
 
 
-.land_text
+.user_text
 {
     color: black
 }
 
+.user_text2
+{
+    color: white;
+    text-align: left;
+    font-weight: 900;
+    position: left
 
-.land_box2
+}
+
+
+.user_box2
 {
     width: 40%;
     height: 40%;
@@ -30,11 +39,11 @@
     overflow: hidden;
     position: relative;
     top: 0; 
-    border-radius: 5px !important;
+    border-radius: 20px !important;
     padding: 10px;
 }
 
-.land_box3
+.user_box3
 {
     width: 40%;
     height: 40%;
@@ -49,25 +58,35 @@
     border-radius: 25px !important;
 }
 
-.land_box3:hover
+.user_box4
 {
-    background-color: rgb(76, 164, 92);
+    width: 80%;
+    height: 80%;
+    background-color: rgba(88, 78, 93, 0.6);
+    margin: 20px;
+    /* float:right; */
+    display: inline-block;
+    padding: 25px;
+    overflow: hidden;
+    position: relative;
+    top: 0; 
+    border-radius: 0px !important;
 }
 
-.land_hole2
+.user_hole2
 {
     margin-left: 9px;
     width: 2%;
     display: inline-block;
 }
 
-.land_hole
+.user_hole
 {
     height: 2%;
     top: 0;
 }
 
-.land_Icon{
+.user_Icon{
     /* float:left;
     width: 100px;
     margin-left: 0.5%; */
