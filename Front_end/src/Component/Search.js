@@ -13,9 +13,12 @@ class search extends React.Component
       <div className="App">
         <header className="App-header">
           <p>
-            Search
-            Something is happening
+            Enter the Abbreviation of a Stock below:
           </p>
+          <form action="/user/" method="post">
+            <input id="abbr" type="text" name="abbr"/>
+            <input type="submit" value="Submit"/>
+          </form>
         </header>
       </div>
     );
