@@ -54,7 +54,7 @@ class User extends React.Component
 
                       <div className="user_box2">
                         <h2 className="user_text"> Search </h2>
-                        <img src={[search_p]} className="land_Icon" align='center' onClick={()=> this.handleClick_Search2()} />
+                        <img src={[search_p]} className="land_Icon" align='center' onClick={()=> this.handleClick_Search2()} alt="standard search button" />
                         <p className="user_text"> --------- </p>
                         <form className="user_Base" onSubmit={this.handleSubmit_search}>
                           <input className="user_Base" type="text"  placeholder = "Seach ...."  name="name"  />

@@ -17,13 +17,12 @@ class search extends React.Component
 
   handle_Change(event)
   {
-            console.log("Opertion55");
-            this.setState( (state, props) =>{
-              return{
-                search_for_dynamic: event.target.value
-              };
-            }
-            )
+    console.log("Opertion55");
+    this.setState( (state, props) =>{
+      return{
+       search_for_dynamic: event.target.value
+      };
+      })
   }
 
 

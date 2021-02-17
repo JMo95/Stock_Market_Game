@@ -40,11 +40,11 @@ class landing extends React.Component
 
         render()
         {
-          var handleClick_Search = () =>
-          {
-            console.log("Opertion2");
-            window.location.href = '/search';
-          }
+          // var handleClick_Search = () =>
+          // {
+          //   console.log("Opertion2");
+          //   window.location.href = '/search';
+          // }
 
           
 
@@ -61,7 +61,7 @@ class landing extends React.Component
                       </div>
                       <div className="land_hole2"> </div>
                       <div className="land_box2">
-                        <img src={[pict]} align='center'  />
+                        <img src={[pict]} align='center' alt="future imagee for stock price" />
                       </div>
                     </div>
 
@@ -70,7 +70,7 @@ class landing extends React.Component
                     <div className="land_box">   
                       <div className="land_box2">
                         <h2 className="land_text"> Search </h2>
-                        <img src={[search_p]} className="land_Icon" align='center' onClick={()=> this.handleClick_Search2()} />
+                        <img src={[search_p]} className="land_Icon" align='center' onClick={()=> this.handleClick_Search2()} alt="standard search button"  />
                         <p className="land_text"> --------- </p>
                         <form className="Nav_Base" onSubmit={this.handleSubmit_search}>
                           <input className="Nav_Base" type="text"  placeholder = "Seach ...."  name="name"  />

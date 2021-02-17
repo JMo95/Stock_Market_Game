@@ -65,7 +65,7 @@ class Nav extends React.Component
           var handleClick_User = () =>
           {
             console.log("Opertion3");
-            if (this.state.user_hello == true)
+            if (this.state.user_hello === true)
             {
                 this.setState({
                   user_hello: false
@@ -86,7 +86,7 @@ class Nav extends React.Component
             {/* <Image source={logo} 
             style={{ alignSelf: 'center', height: 150, width: 150,
             borderWidth: 1, borderRadius: 75 }} /> */}
-                <img src={pictureX} className="Nav_Icon2" onClick={()=> handleClick_landing()}/>
+                <img src={pictureX} className="Nav_Icon2" onClick={()=> handleClick_landing()} alt="we are missing a  logo" />
                 
                 <div className="Nav_Base">
                     
@@ -94,13 +94,13 @@ class Nav extends React.Component
                 <form className="Nav_Base" onSubmit={this.handleSubmit} >
                   <input className="Nav_Base" type="text"  placeholder = "Seach ...."  name="name"  value={this.state.search_A} onChange={this.handle_Change} />
                 </form>
-                <img src={logo} className="Nav_Icon" align='center' onClick={()=> handleClick_Search()} />
+                <img src={logo} className="Nav_Icon" align='center' onClick={()=> handleClick_Search()} alt="standarrd search logo" />
                 
                 <div className="hole3"> </div>
-                <img src={[profile]} className="Nav_Icon" align='right' onClick={()=> handleClick_User()}  />
+                <img src={[profile]} className="Nav_Icon" align='right' onClick={()=> handleClick_User()} alt="say helo to user"  />
                 
                 {(() => {
-              if (this.state.user_hello == true){
+              if (this.state.user_hello === true){
                   return (
                       <div>hello</div>
                   )
