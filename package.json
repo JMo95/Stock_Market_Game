@@ -1,0 +1,24 @@
+{
+  "name": "stock_price_predictor",
+  "version": "1.0.0",
+  "description": "Senior project using machine learning api data to predict stock prices",
+  "main": "index.js",
+  "dependencies": {
+    "bootstrap": "^4.6.0",
+    "react-bootstrap": "^1.4.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BBer2305/Stock_Price_Predictor.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BBer2305/Stock_Price_Predictor/issues"
+  },
+  "homepage": "https://github.com/BBer2305/Stock_Price_Predictor#readme"
+}
