@@ -2,7 +2,7 @@ import './css/App.css';
 import React from "react";
 // import {render} from "react-dom";
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import Nav from './Nav';
+import BootstrapNavbar from './Nav';
 //import {Router, Route} from "react-router";
 
 import landing from "./Component/Landing";
@@ -39,7 +39,7 @@ class App extends React.Component
         {
           return (
             <div className="App"> 
-            <Nav search_F = {this.handleSearch}  />
+            <BootstrapNavbar search_F = {this.handleSearch}  />
             {this.handle_pass_Search}
               <Router>
                 {/* <div className="App_Nav"> */}
