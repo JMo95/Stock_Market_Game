@@ -87,7 +87,7 @@ class BootstrapNavbar extends React.Component{
                     <div className="col-md-12">
                         <Router>
                             <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
-                                <Navbar.Brand href="/">React Bootstrap Navbar</Navbar.Brand>
+                                <Navbar.Brand href="/">Stock Price Predictor</Navbar.Brand>
                                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                                 <Navbar.Collapse id="basic-navbar-nav">
                                     <Nav className="mr-auto">
