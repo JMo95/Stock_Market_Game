@@ -20,4 +20,9 @@ from users import views as userViews
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('register/', userViews.register),
+    path('delete/', userViews.delete),
+    path('changeName/', userViews.changeName),
+    path('addstock/', userViews.addstock),
+    path('getstocks/', userViews.getStocks),
+    path('getuser/', userViews.getUser),
 ]
