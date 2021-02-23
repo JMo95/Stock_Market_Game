@@ -2,7 +2,7 @@ import './css/App.css';
 import React from "react";
 // import {render} from "react-dom";
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import BootstrapNavbar from './GlobalNav';
+import Nav from './Nav';
 //import {Router, Route} from "react-router";
 
 import landing from "./Component/Landing";
@@ -11,9 +11,6 @@ import userX from "./Component/User";
 import regist_P from "./Component/Register";
 import log_in from "./Component/Log_in";
 //import { AuthProvider } from './components/Auth';
-
-//Bootstrap css
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 //function App() {
@@ -42,7 +39,7 @@ class App extends React.Component
         {
           return (
             <div className="App"> 
-            <BootstrapNavbar search_F = {this.handleSearch}  />
+            <Nav search_F = {this.handleSearch}  />
             {this.handle_pass_Search}
               <Router>
                 {/* <div className="App_Nav"> */}
