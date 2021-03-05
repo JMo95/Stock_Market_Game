@@ -22,7 +22,8 @@ urlpatterns = [
     path('register/', userViews.register),
     path('delete/', userViews.delete),
     path('changeName/', userViews.changeName),
-    path('addstock/', userViews.addstock),
+    path('addstock/', userViews.buyStock),
     path('getstocks/', userViews.getStocks),
+    path('removestock/', userViews.sellStock),
     path('getuser/', userViews.getUser),
 ]
