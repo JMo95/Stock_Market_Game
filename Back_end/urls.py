@@ -24,6 +24,10 @@ urlpatterns = [
     path('changeName/', userViews.changeName),
     path('addstock/', userViews.buyStock),
     path('getstocks/', userViews.getStocks),
-    path('removestock/', userViews.sellStock),
+    path('buyStockLimit/', userViews.buyStockLimit),
+    path('sellStock/', userViews.sellStock),
     path('getuser/', userViews.getUser),
+    path('getOrders/', userViews.getOrders),
+    path('sellStockLimit/', userViews.sellStockLimit),
+    path('makestock/', userViews.makeStock),
 ]
