@@ -18,7 +18,7 @@ class FakeStock(models.Model):
     Price = models.FloatField(default=0)
     
 class LimitOrders(models.Model):
-    Symbol = models.CharField(max_length=4,unique=True)
+    Symbol = models.CharField(max_length=4)
     Price = models.FloatField(default=0)
     Stop = models.FloatField(default=0)
     Quantity = models.IntegerField(default=0)
