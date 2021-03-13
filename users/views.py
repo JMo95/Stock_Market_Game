@@ -63,8 +63,12 @@ def buyStockLimit(request):
         currentUser = User.objects.filter(username=Cuser)[0]
         inv = Investor.objects.filter(user=currentUser)
         money = list((inv.values('money')))
-        if money[0]["money"] > (Quantity*Price):
-            LimitOrders.objects.create(Symbol=Symbol,Price=Price,Account=currentUser,Type=Type,Stop=Stop,Quantity=Quantity)
+        if (Type == 'BTP' or Type == 'BTD') and money[0]["money"] > Quantity*getStockPrice(Symbol):
+            LimitOrders.objects.create(Symbol=Symbol,Price=Price,Account=currentUser,Type=Type,Stop=1000000,Quantity=Quantity,OrginalPrice=getStockPrice(Symbol))
+            inv.update(money = money[0]["money"]-(Quantity*getStockPrice(Symbol)))
+            return HttpResponse("Placed Limit order")
+        elif money[0]["money"] > (Quantity*Price) and  (Type != 'BTP' and Type != 'BTD'):
+            LimitOrders.objects.create(Symbol=Symbol,Price=Price,Account=currentUser,Type=Type,Stop=Stop,Quantity=Quantity,OrginalPrice=getStockPrice(Symbol))
             inv.update(money = money[0]["money"]-(Quantity*Price))
             return HttpResponse("Placed Limit order")
         else:
@@ -122,7 +126,7 @@ def sellStockLimit(request):
                 TStock.delete()
             else:
                 TStock.update(Quantity=TStock.values()[0]["Quantity"]-Quantity)
-            LimitOrders.objects.create(Symbol=Symbol,Price=Price,Account=currentUser,Type=Type,Stop=Stop,Quantity=Quantity)
+            LimitOrders.objects.create(Symbol=Symbol,Price=Price,Account=currentUser,Type=Type,Stop=Stop,Quantity=Quantity,OrginalPrice=getStockPrice(Symbol))
             return HttpResponse("Placed Limit order sell")
         else:
             return HttpResponse("not enough stock")
@@ -163,14 +167,14 @@ def getUser(request):
     
     
 def getStockPrice(symbol):
-    return 100;
+    return FakeStock.objects.filter(Symbol=symbol).values("Price")[0]["Price"]
 
 def testlmit(request):
-    limits = LimitOrders.objects.all().order_by('Symbol').values_list('Symbol','Price','Stop','Type','Quantity','Account','id')
+    limits = list(LimitOrders.objects.all().order_by('Symbol').values_list('Symbol','Price','Stop','Type','Quantity','Account','id','OrginalPrice'))
    
     LastSymbol = ''
     CurrentPrice = 0;
-    for x in range(limits.count()):
+    for x in range(len(limits)):
         inv = Investor.objects.filter(user=limits[x][5])
         if LastSymbol != limits[x][0]:
             LastSymbol = limits[x][0]
@@ -178,34 +182,75 @@ def testlmit(request):
         if limits[x][3] == 'BL':
             if CurrentPrice <= limits[x][1]:
                 AddStock(limits[x][0],limits[x][1],limits[x][4],limits[x][5])
-                inv.update(money = inv.values("money")[0]["money"]+(limits[x][1]-CurrentPrice))
+                inv.update(money = inv.values("money")[0]["money"]+(limits[x][1]-CurrentPrice)*limits[x][4])
                 LimitOrders.objects.filter(id=limits[x][6]).delete()
                 print("BL")
         elif limits[x][3] == 'BSL':
             if CurrentPrice >= limits[x][2]:
-                    if CurrentPrice <= limits[x][2]:
+                    if CurrentPrice <= limits[x][1]:
                         AddStock(limits[x][0],limits[x][1],limits[x][4],limits[x][5])
-                        inv.update(money = inv.values("money")[0]["money"]+(limits[x][1]-CurrentPrice))
+                        inv.update(money = inv.values("money")[0]["money"]+(limits[x][1]-CurrentPrice)*limits[x][4])
+                        LimitOrders.objects.filter(id=limits[x][6]).delete()
                     else:
                         LimitOrders.objects.create(Symbol=limits[x][0],Price=limits[x][1],Account=User.objects.filter(id= limits[x][5])[0],Type='BL',Stop=0,Quantity=limits[x][4])
-                    LimitOrders.objects.filter(id=limits[x][6]).delete()
+                        LimitOrders.objects.filter(id=limits[x][6]).delete()
                         
             print("BSL")
         elif limits[x][3] == 'BSM':
+            if CurrentPrice >= limits[x][1]:
+                        AddStock(limits[x][0],limits[x][1],limits[x][4],limits[x][5])
+                        inv.update(money = inv.values("money")[0]["money"]+(limits[x][1]-CurrentPrice)*limits[x][4])
+                        LimitOrders.objects.filter(id=limits[x][6]).delete()     
             print("BSM")
         elif limits[x][3] == 'BTP':
+            if limits[x][2] > CurrentPrice:
+                LimitOrders.objects.filter(id=limits[x][6]).update(Stop=CurrentPrice)
+            elif limits[x][2] + (limits[x][2]*float(limits[x][1]/100)) <= CurrentPrice:
+                AddStock(limits[x][0],limits[x][1],limits[x][4],limits[x][5])
+                inv.update(money = inv.values("money")[0]["money"]+(limits[x][7]-CurrentPrice)*limits[x][4])
+                LimitOrders.objects.filter(id=limits[x][6]).delete()   
             print("BTP")
         elif limits[x][3] == 'BTD':
+            if limits[x][2] > CurrentPrice:
+                LimitOrders.objects.filter(id=limits[x][6]).update(Stop=CurrentPrice)
+            elif limits[x][2] + limits[x][1] <= CurrentPrice:
+                AddStock(limits[x][0],limits[x][1],limits[x][4],limits[x][5])
+                inv.update(money = inv.values("money")[0]["money"]+(limits[x][7]-CurrentPrice)*limits[x][4])
+                LimitOrders.objects.filter(id=limits[x][6]).delete()   
             print("BTD")
         elif limits[x][3] == 'SL':
+            if CurrentPrice >= limits[x][1]:
+                removeStock(limits[x][1],limits[x][4],limits[x][5])
+                LimitOrders.objects.filter(id=limits[x][6]).delete()
             print("SL")
         elif limits[x][3] == 'SSL':
+            if CurrentPrice <= limits[x][2]:
+                    if CurrentPrice >= limits[x][1]:
+                        removeStock(CurrentPrice,limits[x][4],limits[x][5])
+                        LimitOrders.objects.filter(id=limits[x][6]).delete()
+                    else:
+                        LimitOrders.objects.create(Symbol=limits[x][0],Price=limits[x][1],Account=User.objects.filter(id= limits[x][5])[0],Type='SL',Stop=0,Quantity=limits[x][4])
+                        LimitOrders.objects.filter(id=limits[x][6]).delete()
             print("BSSLL")
         elif limits[x][3] == 'SSM':
+            if CurrentPrice <= limits[x][2]:   
+                removeStock(CurrentPrice,limits[x][4],limits[x][5])
+                LimitOrders.objects.filter(id=limits[x][6]).delete()          
             print("SSM")
         elif limits[x][3] == 'STP':
+            if limits[x][2] < CurrentPrice:
+                print(limits[x][2])
+                LimitOrders.objects.filter(id=limits[x][6]).update(Stop=CurrentPrice)
+            elif limits[x][2] - (limits[x][2]*float(limits[x][1]/100)) <= CurrentPrice:
+                removeStock(CurrentPrice,limits[x][4],limits[x][5])
+                LimitOrders.objects.filter(id=limits[x][6]).delete() 
             print("STP")
         elif limits[x][3] == 'STD':
+            if limits[x][2] < CurrentPrice:
+                LimitOrders.objects.filter(id=limits[x][6]).update(Stop=CurrentPrice)
+            elif limits[x][2] - limits[x][1] <= CurrentPrice:
+                removeStock(CurrentPrice,limits[x][4],limits[x][5])
+                LimitOrders.objects.filter(id=limits[x][6]).delete() 
             print("STD")
     return HttpResponse("l")
 
@@ -216,7 +261,11 @@ def AddStock(Symbol,Price,Quantity,CUser):
         TStock.update(Quantity=TStock.values()[0]["Quantity"]+Quantity)
     else:
         TrackedStock.objects.create(Symbol=Symbol,Account=User.objects.filter(id=CUser)[0],Quantity=Quantity)
-            
+        
+        
+def removeStock(Price,Quantity,CUser):
+    inv = Investor.objects.filter(user=CUser)
+    inv.update(money = inv.values("money")[0]["money"]+Quantity*Price)
     
 
 

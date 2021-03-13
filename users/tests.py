@@ -1,63 +1,279 @@
 from django.test import TestCase, Client
-from django.contrib.auth import get_user_model
+from django.http import HttpResponse
+from django.contrib.auth.models import User
 from users.models import TrackedStock
-import json
+from users.models import Investor
+from users.models import FakeStock
+from users.models import LimitOrders
+
 
 class UserTests(TestCase):
     def setUp(self):
         test = 0
 
-    def test_createUserTest(self):
+    def test_Stock(self):
         client = Client()
-        res = client.post('/register/', {'user':'usertest', 'passowrd':'hash', 'email':'usertest@gmail.com'})
-        User = get_user_model()
-        users = User.objects.all().filter(username='usertest')
-        self.assertEqual(users[0].username, 'usertest')
+        res = client.post('/register/',{'user': 'testuser', 'email': 'testuser@test.com', 'password': 'test1234'})
+        res = client.post('/addstock/',{'Quantity': '10', 'stock': 'APL', 'user': 'testuser'})
         
-    def test_DeleteUserTest(self):
+        self.assertEqual(TrackedStock.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').values('Quantity')[0]["Quantity"], 10)
+        self.assertEqual(Investor.objects.filter(user=User.objects.filter(username='testuser')[0]).values('money')[0]["money"],10000-(FakeStock.objects.filter(Symbol='APL').values("Price")[0]["Price"])*10)
         
+        res = client.post('/sellStock/',{'Quantity': '11', 'stock': 'APL', 'user': 'testuser'})
+        
+        self.assertEqual(TrackedStock.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').values('Quantity')[0]["Quantity"], 10)
+        self.assertEqual(Investor.objects.filter(user=User.objects.filter(username='testuser')[0]).values('money')[0]["money"],10000-(FakeStock.objects.filter(Symbol='APL').values("Price")[0]["Price"])*10)
+        self.assertEqual(res.content, HttpResponse("you don't own enough stock").content)
+        
+        res = client.post('/sellStock/',{'Quantity': '10', 'stock': 'APL', 'user': 'testuser'})
+        
+        self.assertEqual(TrackedStock.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').count(), 0)
+        self.assertEqual(Investor.objects.filter(user=User.objects.filter(username='testuser')[0]).values('money')[0]["money"],10000)
+        
+    def test_Stock_Invaild(self):
         client = Client()
-        res = client.post('/register/', {'user':'usertest', 'passowrd':'hash', 'email':'usertest@gmail.com'})
-        res = client.post('/changeName/', {'user':'usertest' ,'new':'newname'})
-        User = get_user_model()
-        users = User.objects.all().filter(username='newname')
-        self.assertEqual(users[0].username, 'newname')
+        res = client.post('/register/',{'user': 'testuser', 'email': 'testuser@test.com', 'password': 'test1234'})
+        res = client.post('/addstock/',{'Quantity': '1000', 'stock': 'APL', 'user': 'testuser'})
+        
+        self.assertEqual(TrackedStock.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').count(), 0)
+        self.assertEqual(Investor.objects.filter(user=User.objects.filter(username='testuser')[0]).values('money')[0]["money"],10000)
+        self.assertEqual(res.content, HttpResponse("not enough money").content)
+        
+        res = client.post('/sellStock/',{'Quantity': '10', 'stock': 'APL', 'user': 'testuser'})
+        
+        self.assertEqual(TrackedStock.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').count(), 0)
+        self.assertEqual(Investor.objects.filter(user=User.objects.filter(username='testuser')[0]).values('money')[0]["money"],10000)
+        self.assertEqual(res.content, HttpResponse("you don't that stock").content)
+        
 
-    def test_ChangeUserTest(self):
-        
+    def test_Stock_Limit(self):
         client = Client()
-        res = client.post('/register/', {'user':'usertest', 'passowrd':'hash', 'email':'usertest@gmail.com'})
-        res = client.post('/delete/', {'user':'usertest'})
-        User = get_user_model()
-        users = User.objects.all().filter(username='usertest')
-        self.assertEqual(users.count(), 0)
+        res = client.post('/register/',{'user': 'testuser', 'email': 'testuser@test.com', 'password': 'test1234'})
+        res = client.post('/buyStockLimit/',{'Quantity': '10', 'stock': 'APL', 'user': 'testuser' , 'price': '100', 'Stop': '0', 'Type': 'BL'})
         
-    def test_addStockTest(self):
-        User = get_user_model()
+        self.assertEqual(LimitOrders.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').values('Quantity')[0]["Quantity"], 10)
+        self.assertEqual(Investor.objects.filter(user=User.objects.filter(username='testuser')[0]).values('money')[0]["money"],9000)
+        
+        res = client.post('/cancelStockLimit/',{ 'user': 'testuser' , 'id' : LimitOrders.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').values('id')[0]["id"]})
+        
+        self.assertEqual(LimitOrders.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').count(), 0)
+        self.assertEqual(Investor.objects.filter(user=User.objects.filter(username='testuser')[0]).values('money')[0]["money"],10000)
+        self.assertEqual(res.content, HttpResponse("cancel buy order").content)           
+        
+        res = client.post('/addstock/',{'Quantity': '10', 'stock': 'APL', 'user': 'testuser'})
+        
+        res = client.post('/sellStockLimit/',{'Quantity': '10', 'stock': 'APL', 'user': 'testuser' , 'price': '100', 'Stop': '0', 'Type': 'SL'})
+        
+        self.assertEqual(LimitOrders.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').values('Quantity')[0]["Quantity"], 10)
+        self.assertEqual(TrackedStock.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').count(), 0)
+        
+        res = client.post('/cancelStockLimit/',{ 'user': 'testuser' , 'id' : LimitOrders.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').values('id')[0]["id"]})
+                                                                                                        
+        self.assertEqual(TrackedStock.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').values('Quantity')[0]["Quantity"], 10)
+        
+        
+        
+    def test_Stock_Limit(self):
         client = Client()
-        res = client.post('/register/', {'user':'usertest', 'passowrd':'hash', 'email':'usertest@gmail.com'})
-        res = client.post('/addstock/', {'stock':'APL', 'user':'usertest'})
-        stock = TrackedStock.objects.all().filter(Symbol='APL')
-        self.assertEqual(stock[0].Account, User.objects.all().filter(username='usertest')[0])
+        res = client.post('/register/',{'user': 'testuser', 'email': 'testuser@test.com', 'password': 'test1234'})
+        res = client.post('/buyStockLimit/',{'Quantity': '10', 'stock': 'APL', 'user': 'testuser' , 'price': '100', 'Stop': '0', 'Type': 'BL'})
+        
+        FakeStock.objects.filter(Symbol='APL').update(Price=90)
+        
+        res = client.get('/test/')
+        
+        self.assertEqual( LimitOrders.objects.filter(Symbol='APL',Account=User.objects.filter(username='testuser')[0]).count(),0)
+        self.assertEqual(TrackedStock.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').values('Quantity')[0]["Quantity"], 10)
+        self.assertEqual(Investor.objects.filter(user=User.objects.filter(username='testuser')[0]).values('money')[0]["money"],9100)
         
         
-    def test_addMutlipleStockTest(self):
-        User = get_user_model()
+    def test_Stock_Limit_stop(self):
         client = Client()
-        res = client.post('/register/', {'user':'usertest', 'passowrd':'hash', 'email':'usertest@gmail.com'})
-        res = client.post('/addstock/', {'stock':'APL', 'user':'usertest'})
-        res = client.post('/addstock/', {'stock':'AMZ', 'user':'usertest'})
-        res = client.post('/addstock/', {'stock':'GGL', 'user':'usertest'})
-        res =  client.get('/getstocks/')
-        jsonres = json.loads(res.content)
-        self.assertEqual(jsonres[0]['Symbol'], 'APL')
-        self.assertEqual(jsonres[1]['Symbol'], 'AMZ')
-        self.assertEqual(jsonres[2]['Symbol'], 'GGL')
+        res = client.post('/register/',{'user': 'testuser', 'email': 'testuser@test.com', 'password': 'test1234'})
+        res = client.post('/buyStockLimit/',{'Quantity': '10', 'stock': 'APL', 'user': 'testuser' , 'price': '110', 'Stop': '100', 'Type': 'BSL'})
         
-    def test_GetUserInfoTest(self):
-        User = get_user_model()
+        FakeStock.objects.filter(Symbol='APL').update(Price=105)
+        
+        res = client.get('/test/')
+        
+        self.assertEqual( LimitOrders.objects.filter(Symbol='APL',Account=User.objects.filter(username='testuser')[0]).count(),0)
+        self.assertEqual(TrackedStock.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').values('Quantity')[0]["Quantity"], 10)
+        self.assertEqual(Investor.objects.filter(user=User.objects.filter(username='testuser')[0]).values('money')[0]["money"],8950)
+        
+        
+    def test_Stock_Limit_Stop_under(self):
         client = Client()
-        res = client.post('/register/', {'user':'usertest', 'passowrd':'hash', 'email':'usertest@gmail.com'})
-        res = client.get('/getuser/')
-        jsonres = json.loads(res.content)
-        self.assertEqual(jsonres, 'APL')
+        res = client.post('/register/',{'user': 'testuser', 'email': 'testuser@test.com', 'password': 'test1234'})
+        res = client.post('/buyStockLimit/',{'Quantity': '10', 'stock': 'APL', 'user': 'testuser' , 'price': '110', 'Stop': '100', 'Type': 'BSL'})
+        
+        FakeStock.objects.filter(Symbol='APL').update(Price=120)
+        
+        res = client.get('/test/')
+        
+        self.assertEqual( LimitOrders.objects.filter(Symbol='APL',Account=User.objects.filter(username='testuser')[0],Type='BL').count(),1)
+        self.assertEqual(TrackedStock.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').count(), 0)
+        self.assertEqual(Investor.objects.filter(user=User.objects.filter(username='testuser')[0]).values('money')[0]["money"],8900)
+        
+        
+    def test_Stock_Limit_Smartekt(self):
+        client = Client()
+        res = client.post('/register/',{'user': 'testuser', 'email': 'testuser@test.com', 'password': 'test1234'})
+        res = client.post('/buyStockLimit/',{'Quantity': '10', 'stock': 'APL', 'user': 'testuser' , 'price': '100', 'Stop': '0', 'Type': 'BSM'})
+        
+        FakeStock.objects.filter(Symbol='APL').update(Price=120)
+        
+        res = client.get('/test/')
+        
+        self.assertEqual( LimitOrders.objects.filter(Symbol='APL',Account=User.objects.filter(username='testuser')[0]).count(),0)
+        self.assertEqual(TrackedStock.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').values('Quantity')[0]["Quantity"], 10)
+        self.assertEqual(Investor.objects.filter(user=User.objects.filter(username='testuser')[0]).values('money')[0]["money"],8800)
+        
+    def test_Stock_Stop_Precent(self):
+        client = Client()
+        res = client.post('/register/',{'user': 'testuser', 'email': 'testuser@test.com', 'password': 'test1234'})
+        res = client.post('/buyStockLimit/',{'Quantity': '10', 'stock': 'APL', 'user': 'testuser' , 'price': '10', 'Stop': '0', 'Type': 'BTP'})
+        
+        FakeStock.objects.filter(Symbol='APL').update(Price=100)
+        
+        res = client.get('/test/')
+        
+        FakeStock.objects.filter(Symbol='APL').update(Price=110)
+        
+        res = client.get('/test/')
+        
+        self.assertEqual( LimitOrders.objects.filter(Symbol='APL',Account=User.objects.filter(username='testuser')[0]).count(),0)
+        self.assertEqual(TrackedStock.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').values('Quantity')[0]["Quantity"], 10)
+        self.assertEqual(Investor.objects.filter(user=User.objects.filter(username='testuser')[0]).values('money')[0]["money"],8900)
+        
+        
+    def test_Stock_Stop_Dollar(self):
+        client = Client()
+        res = client.post('/register/',{'user': 'testuser', 'email': 'testuser@test.com', 'password': 'test1234'})
+        res = client.post('/buyStockLimit/',{'Quantity': '10', 'stock': 'APL', 'user': 'testuser' , 'price': '15', 'Stop': '0', 'Type': 'BTD'})
+
+        FakeStock.objects.filter(Symbol='APL').update(Price=100)
+
+        res = client.get('/test/')
+
+        FakeStock.objects.filter(Symbol='APL').update(Price=120)
+
+        res = client.get('/test/')
+
+        self.assertEqual( LimitOrders.objects.filter(Symbol='APL',Account=User.objects.filter(username='testuser')[0]).count(),0)
+        self.assertEqual(TrackedStock.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').values('Quantity')[0]["Quantity"], 10)
+        self.assertEqual(Investor.objects.filter(user=User.objects.filter(username='testuser')[0]).values('money')[0]["money"],8800)
+        
+    def test_Stock_Sell_limit(self):
+        client = Client()
+        res = client.post('/register/',{'user': 'testuser', 'email': 'testuser@test.com', 'password': 'test1234'})
+        
+        
+        FakeStock.objects.filter(Symbol='APL').update(Price=100)
+        res = client.post('/addstock/',{'Quantity': '10', 'stock': 'APL', 'user': 'testuser'})
+        
+        FakeStock.objects.filter(Symbol='APL').update(Price=120)
+        res = client.post('/sellStockLimit/',{'Quantity': '10', 'stock': 'APL', 'user': 'testuser' , 'price': '120', 'Stop': '0', 'Type': 'SL'})
+
+        
+
+        res = client.get('/test/')
+        
+
+        self.assertEqual( LimitOrders.objects.filter(Symbol='APL',Account=User.objects.filter(username='testuser')[0]).count(),0)
+        self.assertEqual(TrackedStock.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').count(),0)
+        self.assertEqual(Investor.objects.filter(user=User.objects.filter(username='testuser')[0]).values('money')[0]["money"],10200)
+
+        
+        
+    def test_Stock_Sell_Slimit(self):
+        client = Client()
+        res = client.post('/register/',{'user': 'testuser', 'email': 'testuser@test.com', 'password': 'test1234'})
+        
+        
+        FakeStock.objects.filter(Symbol='APL').update(Price=100)
+        res = client.post('/addstock/',{'Quantity': '10', 'stock': 'APL', 'user': 'testuser'})
+        
+        FakeStock.objects.filter(Symbol='APL').update(Price=90)
+        res = client.post('/sellStockLimit/',{'Quantity': '10', 'stock': 'APL', 'user': 'testuser' , 'price': '80', 'Stop': '100', 'Type': 'SSL'})
+
+        
+
+        res = client.get('/test/')
+        
+
+        self.assertEqual( LimitOrders.objects.filter(Symbol='APL',Account=User.objects.filter(username='testuser')[0]).count(),0)
+        self.assertEqual(TrackedStock.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').count(),0)
+        self.assertEqual(Investor.objects.filter(user=User.objects.filter(username='testuser')[0]).values('money')[0]["money"],9900)
+        
+        
+    def test_Stock_Sell_Sllimit(self):
+        client = Client()
+        res = client.post('/register/',{'user': 'testuser', 'email': 'testuser@test.com', 'password': 'test1234'})
+        
+        
+        FakeStock.objects.filter(Symbol='APL').update(Price=100)
+        res = client.post('/addstock/',{'Quantity': '10', 'stock': 'APL', 'user': 'testuser'})
+        
+        FakeStock.objects.filter(Symbol='APL').update(Price=80)
+        res = client.post('/sellStockLimit/',{'Quantity': '10', 'stock': 'APL', 'user': 'testuser' , 'price': '85', 'Stop': '90', 'Type': 'SSL'})
+
+        
+
+        res = client.get('/test/')
+        
+
+        self.assertEqual( LimitOrders.objects.filter(Symbol='APL',Account=User.objects.filter(username='testuser')[0],Type='SL').count(),1)
+        self.assertEqual( LimitOrders.objects.filter(Symbol='APL',Account=User.objects.filter(username='testuser')[0],Type='SSL').count(),0)
+        self.assertEqual(Investor.objects.filter(user=User.objects.filter(username='testuser')[0]).values('money')[0]["money"],9000)
+        
+        
+    def test_Stock_Sell_SMlimit(self):
+        client = Client()
+        res = client.post('/register/',{'user': 'testuser', 'email': 'testuser@test.com', 'password': 'test1234'})
+        
+        
+        FakeStock.objects.filter(Symbol='APL').update(Price=100)
+        res = client.post('/addstock/',{'Quantity': '10', 'stock': 'APL', 'user': 'testuser'})
+        
+        FakeStock.objects.filter(Symbol='APL').update(Price=50)
+        res = client.post('/sellStockLimit/',{'Quantity': '10', 'stock': 'APL', 'user': 'testuser' , 'price': '0', 'Stop': '100', 'Type': 'SSM'})
+
+        
+
+        res = client.get('/test/')
+        
+
+        self.assertEqual( LimitOrders.objects.filter(Symbol='APL',Account=User.objects.filter(username='testuser')[0]).count(),0)
+        self.assertEqual(TrackedStock.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').count(),0)
+        self.assertEqual(Investor.objects.filter(user=User.objects.filter(username='testuser')[0]).values('money')[0]["money"],9500)
+        
+        
+        
+    def test_Stock_Sell_STlimit(self):
+        client = Client()
+        res = client.post('/register/',{'user': 'testuser', 'email': 'testuser@test.com', 'password': 'test1234'})
+        
+        
+        FakeStock.objects.filter(Symbol='APL').update(Price=100)
+        res = client.post('/addstock/',{'Quantity': '10', 'stock': 'APL', 'user': 'testuser'})
+        
+        res = client.post('/sellStockLimit/',{'Quantity': '10', 'stock': 'APL', 'user': 'testuser' , 'price': '10', 'Stop': '0', 'Type': 'STP'})
+
+        
+        res = client.get('/test/')
+        self.assertEqual( LimitOrders.objects.filter(Symbol='APL',Account=User.objects.filter(username='testuser')[0]).count(),1)
+        FakeStock.objects.filter(Symbol='APL').update(Price=90)
+        res = client.get('/test/')
+        
+        self.assertEqual( LimitOrders.objects.filter(Symbol='APL',Account=User.objects.filter(username='testuser')[0]).count(),0)
+        self.assertEqual(TrackedStock.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').count(),0)
+        self.assertEqual(Investor.objects.filter(user=User.objects.filter(username='testuser')[0]).values('money')[0]["money"],9900)
+        
+    
+        
+        
+        
+        
+        
+        
+    
