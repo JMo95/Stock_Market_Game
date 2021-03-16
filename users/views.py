@@ -7,6 +7,9 @@ from users.models import FakeStock
 from users.models import LimitOrders
 from django.core import serializers
 from django.http import JsonResponse
+import pandas as pd
+import datetime as dt
+import time as t
 import random
 import threading
 import time
@@ -169,7 +172,8 @@ def getUser(request):
 def getStockPrice(symbol):
     return FakeStock.objects.filter(Symbol=symbol).values("Price")[0]["Price"]
 
-def testlmit(request):
+def updateOrders():
+    print("Test Limit")
     limits = list(LimitOrders.objects.all().order_by('Symbol').values_list('Symbol','Price','Stop','Type','Quantity','Account','id','OrginalPrice'))
    
     LastSymbol = ''
@@ -184,75 +188,100 @@ def testlmit(request):
                 AddStock(limits[x][0],limits[x][1],limits[x][4],limits[x][5])
                 inv.update(money = inv.values("money")[0]["money"]+(limits[x][1]-CurrentPrice)*limits[x][4])
                 LimitOrders.objects.filter(id=limits[x][6]).delete()
-                print("BL")
+                printInfo(limits[x],CurrentPrice)
         elif limits[x][3] == 'BSL':
             if CurrentPrice >= limits[x][2]:
                     if CurrentPrice <= limits[x][1]:
                         AddStock(limits[x][0],limits[x][1],limits[x][4],limits[x][5])
                         inv.update(money = inv.values("money")[0]["money"]+(limits[x][1]-CurrentPrice)*limits[x][4])
                         LimitOrders.objects.filter(id=limits[x][6]).delete()
+                        printInfo(limits[x],CurrentPrice)
                     else:
                         LimitOrders.objects.create(Symbol=limits[x][0],Price=limits[x][1],Account=User.objects.filter(id= limits[x][5])[0],Type='BL',Stop=0,Quantity=limits[x][4])
                         LimitOrders.objects.filter(id=limits[x][6]).delete()
-                        
-            print("BSL")
+                        printInfo(limits[x],CurrentPrice)
         elif limits[x][3] == 'BSM':
             if CurrentPrice >= limits[x][1]:
                         AddStock(limits[x][0],limits[x][1],limits[x][4],limits[x][5])
                         inv.update(money = inv.values("money")[0]["money"]+(limits[x][1]-CurrentPrice)*limits[x][4])
-                        LimitOrders.objects.filter(id=limits[x][6]).delete()     
-            print("BSM")
+                        LimitOrders.objects.filter(id=limits[x][6]).delete()
+                        printInfo(limits[x],CurrentPrice)
         elif limits[x][3] == 'BTP':
             if limits[x][2] > CurrentPrice:
                 LimitOrders.objects.filter(id=limits[x][6]).update(Stop=CurrentPrice)
             elif limits[x][2] + (limits[x][2]*float(limits[x][1]/100)) <= CurrentPrice:
                 AddStock(limits[x][0],limits[x][1],limits[x][4],limits[x][5])
                 inv.update(money = inv.values("money")[0]["money"]+(limits[x][7]-CurrentPrice)*limits[x][4])
-                LimitOrders.objects.filter(id=limits[x][6]).delete()   
-            print("BTP")
+                LimitOrders.objects.filter(id=limits[x][6]).delete()
+                printInfo(limits[x],CurrentPrice)
         elif limits[x][3] == 'BTD':
             if limits[x][2] > CurrentPrice:
                 LimitOrders.objects.filter(id=limits[x][6]).update(Stop=CurrentPrice)
             elif limits[x][2] + limits[x][1] <= CurrentPrice:
                 AddStock(limits[x][0],limits[x][1],limits[x][4],limits[x][5])
                 inv.update(money = inv.values("money")[0]["money"]+(limits[x][7]-CurrentPrice)*limits[x][4])
-                LimitOrders.objects.filter(id=limits[x][6]).delete()   
-            print("BTD")
+                LimitOrders.objects.filter(id=limits[x][6]).delete()
+                printInfo(limits[x],CurrentPrice)
         elif limits[x][3] == 'SL':
             if CurrentPrice >= limits[x][1]:
                 removeStock(limits[x][1],limits[x][4],limits[x][5])
                 LimitOrders.objects.filter(id=limits[x][6]).delete()
-            print("SL")
+                printInfo(limits[x],CurrentPrice)
         elif limits[x][3] == 'SSL':
             if CurrentPrice <= limits[x][2]:
                     if CurrentPrice >= limits[x][1]:
                         removeStock(CurrentPrice,limits[x][4],limits[x][5])
                         LimitOrders.objects.filter(id=limits[x][6]).delete()
+                        printInfo(limits[x],CurrentPrice)
                     else:
                         LimitOrders.objects.create(Symbol=limits[x][0],Price=limits[x][1],Account=User.objects.filter(id= limits[x][5])[0],Type='SL',Stop=0,Quantity=limits[x][4])
                         LimitOrders.objects.filter(id=limits[x][6]).delete()
-            print("BSSLL")
+                        printInfo(limits[x],CurrentPrice)
         elif limits[x][3] == 'SSM':
             if CurrentPrice <= limits[x][2]:   
                 removeStock(CurrentPrice,limits[x][4],limits[x][5])
-                LimitOrders.objects.filter(id=limits[x][6]).delete()          
-            print("SSM")
+                LimitOrders.objects.filter(id=limits[x][6]).delete()  
+                printInfo(limits[x],CurrentPrice)
         elif limits[x][3] == 'STP':
             if limits[x][2] < CurrentPrice:
                 print(limits[x][2])
                 LimitOrders.objects.filter(id=limits[x][6]).update(Stop=CurrentPrice)
-            elif limits[x][2] - (limits[x][2]*float(limits[x][1]/100)) <= CurrentPrice:
+            elif limits[x][2] - (limits[x][2]*float(limits[x][1]/100)) >= CurrentPrice:
                 removeStock(CurrentPrice,limits[x][4],limits[x][5])
                 LimitOrders.objects.filter(id=limits[x][6]).delete() 
-            print("STP")
+                printInfo(limits[x],CurrentPrice)
         elif limits[x][3] == 'STD':
             if limits[x][2] < CurrentPrice:
                 LimitOrders.objects.filter(id=limits[x][6]).update(Stop=CurrentPrice)
-            elif limits[x][2] - limits[x][1] <= CurrentPrice:
+            elif limits[x][2] - limits[x][1] >= CurrentPrice:
                 removeStock(CurrentPrice,limits[x][4],limits[x][5])
                 LimitOrders.objects.filter(id=limits[x][6]).delete() 
-            print("STD")
+                printInfo(limits[x],CurrentPrice)
+
+def testlmit(request):
+   # stonks = list(FakeStock.objects.all().values_list("Symbol"))
+    
+    #for x in range(len(stonks)):
+       #  AddStock(stonks[x][0],0,1000,User.objects.filter(username='jake').values("id")[0]['id'])
+    LimitOrders.objects.all().delete()
+    LimitOrders.objects.create(Symbol="APL",Price=getStockPrice("APL")-getStockPrice("APL")*.05,Account=User.objects.filter(username='jake')[0],Type='BL',Stop=0,Quantity=15)
+    LimitOrders.objects.create(Symbol="T",Price=getStockPrice("T")+getStockPrice("T")*.05,Account=User.objects.filter(username='jake')[0],Type='BSL',Stop=getStockPrice("T")+getStockPrice("T")*.1,Quantity=15)
+    LimitOrders.objects.create(Symbol="COX",Price=getStockPrice("COX")+getStockPrice("COX")*.05,Account=User.objects.filter(username='jake')[0],Type='BSM',Stop=105,Quantity=15)
+    LimitOrders.objects.create(Symbol="CHP",Price=7,Account=User.objects.filter(username='jake')[0],Type='BTP',Stop=100000,Quantity=15)
+    LimitOrders.objects.create(Symbol="GME",Price=10,Account=User.objects.filter(username='jake')[0],Type='BTD',Stop=100000,Quantity=15)
+    LimitOrders.objects.create(Symbol="AMC",Price=getStockPrice("AMC")+getStockPrice("AMC")*.05,Account=User.objects.filter(username='jake')[0],Type='SL',Stop=0,Quantity=15)
+    LimitOrders.objects.create(Symbol="AMZ",Price=getStockPrice("AMZ")-getStockPrice("AMZ")*.05,Account=User.objects.filter(username='jake')[0],Type='SSL',Stop=getStockPrice("AMZ")-getStockPrice("AMZ")*.1,Quantity=15)
+    LimitOrders.objects.create(Symbol="GOOG",Price=getStockPrice("GOOG")-getStockPrice("GOOG")*.05,Account=User.objects.filter(username='jake')[0],Type='SSM',Stop=450,Quantity=15)
+    LimitOrders.objects.create(Symbol="APL",Price=5,Account=User.objects.filter(username='jake')[0],Type='STP',Stop=0,Quantity=15)
+    LimitOrders.objects.create(Symbol="T",Price=8,Account=User.objects.filter(username='jake')[0],Type='STD',Stop=0,Quantity=15)
+
+    #updateOrders()
     return HttpResponse("l")
+
+
+def printInfo(Order, Price):
+    print(Order)
+    print(" Price: " + str(Price))
 
 def AddStock(Symbol,Price,Quantity,CUser):
     inv = Investor.objects.filter(user=CUser)
@@ -262,7 +291,7 @@ def AddStock(Symbol,Price,Quantity,CUser):
     else:
         TrackedStock.objects.create(Symbol=Symbol,Account=User.objects.filter(id=CUser)[0],Quantity=Quantity)
         
-        
+
 def removeStock(Price,Quantity,CUser):
     inv = Investor.objects.filter(user=CUser)
     inv.update(money = inv.values("money")[0]["money"]+Quantity*Price)
@@ -271,16 +300,6 @@ def removeStock(Price,Quantity,CUser):
 
 def makeStock(request):
     if request.method == 'GET':
-        
-        #FakeStock.objects.create(Symbol='APL',Price=123.57)
-        #FakeStock.objects.create(Symbol='GOOG',Price=503.23)
-        #FakeStock.objects.create(Symbol='AMZ',Price=1579.99)
-        #FakeStock.objects.create(Symbol='GME',Price=152.12)
-        #FakeStock.objects.create(Symbol='AMC',Price=14.24)
-        #FakeStock.objects.create(Symbol='T',Price=50.31)
-        #FakeStock.objects.create(Symbol='COX',Price=88.88)
-        #FakeStock.objects.create(Symbol='NEW',Price=7.23)
-        #FakeStock.objects.create(Symbol='CHP',Price=1.57)
         stocks = list(FakeStock.objects.all().values('Symbol','Price'))
         return JsonResponse(stocks, safe=False)
     
@@ -306,8 +325,12 @@ def background_job():
     
     for x in range(9):
         newPrice =round( stocks[x][1] + stocks[x][1] * (float((random.randint(1,10)*random.randint(-1,1)))/100),2)
-        print(stocks[x][0] + "  " + str(stocks[x][1]) + " New Price: " + str(newPrice))
         FakeStock.objects.filter(Symbol=stocks[x][0]).update(Price=newPrice)
+        
+    print("Test Limit")
+    limits = list(LimitOrders.objects.all().order_by('Symbol').values_list('Symbol','Price','Stop','Type','Quantity','Account','id','OrginalPrice'))
+   
+    updateOrders()
     
 def startsheduler(request):
     if request.method == 'GET':
@@ -316,3 +339,17 @@ def startsheduler(request):
         # Start the background thread
         stop_run_continuously = run_continuously()
     return HttpResponse("started shecduler")
+
+
+def getHistoricalStockPrice(request):
+    end_time = dt.datetime.today()
+    start_time = dt.datetime.today() - dt.timedelta(days=365)
+   
+    start_time_int = int(t.mktime(start_time.timetuple()))
+    end_time_int = int(t.mktime(end_time.timetuple()))
+
+    
+    stock_url = "https://query1.finance.yahoo.com/v7/finance/download/"+request.POST.get("Symbol")+"?period1="+str(start_time_int)+"&period2="+str(end_time_int)+"&interval=1d&events=history"
+    
+    info = pd.read_csv(stock_url)
+    return JsonResponse(info.to_json(), safe=False)

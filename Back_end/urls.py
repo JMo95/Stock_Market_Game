@@ -31,6 +31,8 @@ urlpatterns = [
     path('sellStockLimit/', userViews.sellStockLimit),
     path('cancelStockLimit/', userViews.cancelStockLimit),
     path('startsheduler/', userViews.startsheduler),
+    path('getHistoricalStockPrice/', userViews.getHistoricalStockPrice),
     path('test/', userViews.testlmit),
     path('makestock/', userViews.makeStock),
+    
 ]
