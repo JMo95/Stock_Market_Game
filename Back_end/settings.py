@@ -26,7 +26,7 @@ SECRET_KEY = 'ai6q6-s9&n1%ql(%9b4!x9vq7#2)&tul^$x1jsg$qvir0(c-+s'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['stonk-price-predictor.herokuapp.com','127.0.0.1']
+ALLOWED_HOSTS = ['stonk-price-predictor.herokuapp.com','127.0.0.1', 'localhost']
 
 
 # Application definition
