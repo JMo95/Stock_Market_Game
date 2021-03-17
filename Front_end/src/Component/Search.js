@@ -17,7 +17,9 @@ class search extends React.Component
           </p>
           <form action="/user/" method="post">
             <input id="abbr" type="text" name="abbr"/>
-            <input type="submit" value="Submit"/>
+            <button type="submit" className="btn btn-primary mb-5"> 
+              Submit 
+            </button> 
           </form>
         </header>
       </div>

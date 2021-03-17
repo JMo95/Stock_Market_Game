@@ -11,15 +11,32 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
+def refine_values(summary):
+    important_stats = []
+    for i in [6,7,8,10,-1]:
+        important_stats.append(summary[i])
+
+    hold_range = summary[4][1].split(' ')
+    important_stats.insert(0, ['Daily High', hold_range[2]])
+    important_stats.insert(0, ['Daily Low', hold_range[0]])
+    return important_stats
+
 def scrape(abbr):
     URL = "https://finance.yahoo.com/quote/" + abbr + "?p=" + abbr #link to stock info
     page = requests.get(URL) #scrape URL
     soup = BeautifulSoup(page.content, 'html.parser') #set up parser
     
     results = soup.find(id="quote-summary") #narrow scrape to class quote-summary
-
+    price_find = soup.find(class_="Trsdu(0.3s) Fw(b) Fz(36px) Mb(-4px) D(ib)")
     #pre-defined field
     #fields stores summary info
+    #narrows search further
+    try:
+        value_elems = results.find_all('td', class_='Ta(end) Fw(600) Lh(14px)')
+    except:
+        print("ERROR: Abbreviation Not Found")
+        exit()
+
     fields = [["Previous Close"], 
               ["Open"],
               ["Bid"],
@@ -35,14 +52,8 @@ def scrape(abbr):
               ["Earnings Date"],
               ["Forward Dividend & Yield"],
               ["Ex-Dividend Date"],
-              ["1y Target Est"]]
-
-    #narrows search further
-    try:
-        value_elems = results.find_all('td', class_='Ta(end) Fw(600) Lh(14px)')
-    except:
-        print("ERROR: Abbreviation Not Found")
-        exit()
+              ["1y Target Est"],
+              ["Price"]]
 
     i=0
     for value_elem in value_elems: #loops through classes containing important info
@@ -62,7 +73,9 @@ def scrape(abbr):
         fields[i].append(value)
         i+=1
 
-    return fields
+    fields[-1].append(re.split('>|<|\n',str(price_find))[-3])
+
+    return refine_values(fields)
     #return render(abbr, 'Front_end/search.html', fields)
 
 if __name__ == "__main__":
@@ -71,5 +84,4 @@ if __name__ == "__main__":
         exit()
 
     summary = scrape(sys.argv[1])
-    for s in summary:
-        print(s)
+    print(summary)
