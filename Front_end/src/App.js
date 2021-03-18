@@ -11,6 +11,8 @@ import userX from "./Component/User";
 import regist_P from "./Component/Register";
 import log_in from "./Component/Log_in";
 import dataB from "./Component/dataB";
+import anonymous from "./Component/dataB/anonymous";
+import stock_C from "./Component/dataB/stock_collection";
 //import { AuthProvider } from './components/Auth';
 
 
@@ -58,6 +60,8 @@ class App extends React.Component
                           <Route exact path="/Log_in" component={log_in} />
                           <Route exact path="/Register" component={regist_P} />
                           <Route exact path="/dataB" component={dataB} />
+                          <Route exact path="/anonymous" component={anonymous} />
+                          <Route exact path="/stock_C" component={stock_C} />
                           
                       </Switch>
                     </div>  
