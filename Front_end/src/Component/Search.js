@@ -124,25 +124,30 @@ handleInput = (e) => {
                     }} 
                 /> 
   
-                {this.state.details.filter(detail => detail.name.toLowerCase().includes(this.state.search_for_dynamic.toLowerCase()) ).map((detail, id) => ( 
+                
+                {
+                  this.state.details.filter(detail => detail.name.toLowerCase().includes(this.state.search_for_dynamic.toLowerCase()) ).map((detail, id) => ( 
                     <div key={id}> 
-                        <div className="card shadow-lg"> 
-                            <div className={"bg-" + this.renderSwitch(id % 6) +  
-                                          " card-header"}>Stock {id + 1}</div> 
-                            <div className="card-body"> 
-                                <blockquote className={"text-" + this.renderSwitch(id % 6) +  
-                                                   " blockquote mb-0"}> 
-                                    <h1> {detail.firstname} {detail.name} </h1> 
-                                    <footer className="blockquote-footer"> 
-                                        {" "} 
-                                        <cite title="Source Title">{detail.Company}</cite> 
-                                    </footer> 
-                                </blockquote> 
-                            </div> 
+                      <div className="card shadow-lg"> 
+                        <div className={"bg-" + this.renderSwitch(id % 6) + " card-header"}>Stock {id + 1}</div> 
+                          <div className="card-body"> 
+                            <blockquote className={"text-" + this.renderSwitch(id % 6) +  " blockquote mb-0"}> 
+                              <h1> {detail.firstname} {detail.name} </h1> 
+                              <footer className="blockquote-footer"> 
+                                {" "} 
+                                <cite title="Source Title">{detail.Company}</cite> 
+                                <div></div>
+                                {"--"}
+                                <cite title="Source Title">{detail.price}$</cite> 
+                              </footer> 
+                            </blockquote> 
+                          </div> 
                         </div> 
                         <span className="border border-primary "></span> 
-                    </div> 
-                ))} 
+                      </div> 
+                    ))
+                }
+
         </header>
       </div>
     );

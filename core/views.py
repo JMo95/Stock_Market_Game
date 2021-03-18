@@ -44,7 +44,7 @@ class ReactView_S(APIView):
 	serializer_class = ReactStock
 
 	def get(self, request): 
-		detail = [ {"name": detail.name,"Company": detail.Company, "price": detail.price, "description": detail.description, "date": detail.date}
+		detail = [ {"name": detail.name,"Company": detail.Company, "price": detail.price, "description": detail.description, "date": detail.date, "ticker": detail.ticker,}
 		for detail in Stock.objects.all()] 
 		return Response(detail) 
 

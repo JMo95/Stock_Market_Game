@@ -35,67 +35,6 @@ state = {
   lastname: "",
   conf_passw: ""
 }; 
-  
-
-  handle_Change_First_name(event)
-  {
-    this.setState( (state, props) =>{
-      return{
-        firstname: event.target.value
-      };
-      })
-      console.log(this.state.firstname);
-  }
-
-  handle_Change_last_name(event)
-  {
-    this.setState( (state, props) =>{
-      return{
-        lastname: event.target.value
-      };
-      })
-      console.log(this.state.lastname);
-  }
-
-  handle_Change_user_name(event)
-  {
-    this.setState( (state, props) =>{
-      return{
-        username: event.target.value
-      };
-      })
-      console.log(this.state.username);
-  }
-
-  handle_Change_deposit(event)
-  {
-    this.setState( (state, props) =>{
-      return{
-        deposit: event.target.value
-      };
-      })
-      console.log(this.state.deposit);
-  }
-
-  handle_Change_pass(event)
-  {
-    this.setState( (state, props) =>{
-      return{
-       passw: event.target.value
-      };
-      })
-    console.log(this.state.passw);
-  }
-
-  handle_Change_pass_con(event)
-  {
-    this.setState( (state, props) =>{
-      return{
-       conf_passw: event.target.value
-      };
-      })
-    console.log(this.state.conf_passw);
-  }
 
 
 
@@ -111,7 +50,7 @@ handleInput = (e) => {
 }; 
 
 handleSubmit = (e) => { 
-    e.preventDefault(); 
+    // e.preventDefault(); 
     
     console.log("Submit Happen")
 
@@ -130,6 +69,7 @@ handleSubmit = (e) => {
                 deposit: 0.0,
               firstname: "", 
               lastname: "",
+              conf_passw: ""
             }); 
         }) 
         .catch((err) => {}); 
@@ -201,7 +141,7 @@ handleSubmit = (e) => {
                       <div className="reg_text">Password: </div>
                     </div>
                     <div className="reg_box3">
-                      <input className="Nav_Base" type="text"  placeholder = "Name..."  name="password"  
+                      <input className="Nav_Base" type="password"  placeholder = "Name..."  name="password"  
                               value={this.state.password} onChange={this.handleInput}/>
                     </div>
                   </div>
@@ -211,11 +151,12 @@ handleSubmit = (e) => {
                       <div className="reg_text">Confirm Password: </div>
                     </div>
                     <div className="reg_box3">
-                      <input className="reg_Base" type="text"  placeholder = "Name..."  name="conf_passw" 
+                      <input className="reg_Base" type="password"  placeholder = "Name..."  name="conf_passw" 
                               value={this.state.conf_passw} onChange={this.handleInput}/>
                     </div>
                   </div>
                   {(() => {
+                    
                       if (this.state.password !== this.state.conf_passw && this.state.conf_passw .length > 1){
                         
                           return (
@@ -223,7 +164,10 @@ handleSubmit = (e) => {
                           )
                       }
                       
-                      return <button type="submit" className="btn btn-primary mb-5"> Submit </button> ;
+                      if(this.state.password === this.state.conf_passw && this.state.conf_passw .length > 1)
+                      {
+                        return <button type="submit" className="btn btn-primary mb-5"> Submit </button> ;
+                      }
                     })()}
 
                     

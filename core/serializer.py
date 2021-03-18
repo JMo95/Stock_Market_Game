@@ -16,7 +16,7 @@ class ReactUser(serializers.ModelSerializer):
 class ReactStock(serializers.ModelSerializer): 
 	class Meta: 
 		model = Stock 
-		fields = ['name', 'Company', 'price', 'description', 'date']
+		fields = ['name', 'Company', 'price', 'description', 'date', 'ticker']
 
 
 

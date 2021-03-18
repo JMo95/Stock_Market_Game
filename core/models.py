@@ -26,6 +26,7 @@ class Stock(models.Model):
 	price = models.IntegerField()
 	description = models.CharField(max_length=400)
 	date = models.DateTimeField(auto_now=False, auto_now_add=False)
+	ticker = models.CharField(max_length=20)
 
 	def __str__(self):
     	 return super().__str__()

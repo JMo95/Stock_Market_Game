@@ -186,7 +186,7 @@ class dataB extends React.Component {
                                     <h1> {detail.firstname} {detail.lastname} </h1> 
                                     <footer className="blockquote-footer"> 
                                         {" "} 
-                                        <cite title="Source Title">{detail.deposit}</cite> 
+                                        <cite title="Source Title">{detail.deposit}$</cite> 
                                     </footer> 
                                 </blockquote> 
                             </div> 
