@@ -1,9 +1,9 @@
-from django.shortcuts import render 
+"""from django.shortcuts import render 
 from json import dumps
 from django import forms
 
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render"""
 
 import sys
 import re
@@ -21,7 +21,7 @@ def refine_values(summary):
     important_stats.insert(0, ['Daily Low', hold_range[0]])
     return important_stats
 
-def scrape(abbr):
+def scrape_stock(abbr):
     URL = "https://finance.yahoo.com/quote/" + abbr + "?p=" + abbr #link to stock info
     page = requests.get(URL) #scrape URL
     soup = BeautifulSoup(page.content, 'html.parser') #set up parser
@@ -83,5 +83,5 @@ if __name__ == "__main__":
         print("ERROR: Expecting 1 command line argument")
         exit()
 
-    summary = scrape(sys.argv[1])
+    summary = scrape_stock(sys.argv[1])
     print(summary)
