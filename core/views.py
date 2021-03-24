@@ -20,3 +20,19 @@ class ReactView(APIView):
 		if serializer.is_valid(raise_exception=True): 
 			serializer.save() 
 			return Response(serializer.data) 
+
+class PullStockView(APIView): 
+	
+	serializer_class = PullStockSerializer 
+
+	def get(self, request): 
+		detail = [ {"stock_name": detail.name} 
+		for detail in React.objects.all()] 
+		return Response(detail) 
+
+	def post(self, request): 
+
+		serializer = PullStockSerializer(data=request.data) 
+		if serializer.is_valid(raise_exception=True): 
+			serializer.save() 
+			return Response(serializer.data) 
