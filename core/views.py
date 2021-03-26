@@ -3,7 +3,6 @@ from rest_framework.views import APIView
 from . models import *
 from rest_framework.response import Response 
 from . serializer import *
-# import scrape_data
 # Create your views here. 
 
 class ReactView(APIView): 
@@ -26,26 +25,42 @@ class PullStockView(APIView):
 	
 	serializer_class = PullStockSerializer 
 
-	def get(self, request): 
-		detail = [ {"name": detail.stock_name, "low": scrape_stock(detail.stock_name)} 
-		for detail in PullStock.objects.all()] 
-		return Response(detail) 
+	def load_elements(self):
+		detail = [ {"name": detail.stock_name, "market_cap": scrape_stock(detail.stock_name)[4]} 
+		for detail in PullStock.objects.all()]
+		return detail
+
+	def get(self, request):
+		return Response(self.load_elements()) 
+		#return Response(detail)
 
 	def post(self, request): 
+		serializer = PullStockSerializer(data=request.data) 
+		if serializer.is_valid(raise_exception=True): 
+			serializer.save()
+			return Response(self.load_elements())
+			#return Response(serializer.data) 
 
+	def put(self, request):
 		serializer = PullStockSerializer(data=request.data) 
 		if serializer.is_valid(raise_exception=True): 
 			serializer.save() 
-			return Response(serializer.data) 
+			stk_name = serializer.data['stock_name']
+			for detail in PullStock.objects.all()[:PullStock.objects.count()-1]:
+				if detail.stock_name == stk_name:
+					detail.delete()
+					break
+			return Response(self.load_elements())
+			#return Response(serializer.data)
 
-"""from django.shortcuts import render 
-from json import dumps
-from django import forms
+	def delete(self, request):
+		PullStock.objects.all().delete()
+		return Response(self.load_elements())
+		#return Response(detail)
 
-from django.http import HttpResponseRedirect
-from django.shortcuts import render"""
+	#line below kept for future use
+	#PullStock.objects.filter(id=id).delete()
 
-#import sys
 import re
 
 import requests
@@ -74,7 +89,7 @@ def scrape_stock(abbr):
     try:
         value_elems = results.find_all('td', class_='Ta(end) Fw(600) Lh(14px)')
     except:
-        return [[None, "ERROR"]]
+        return [[None, "ERROR"], [None, "ERROR"], [None, "ERROR"], [None, "ERROR"], [None, "ERROR"], [None, "ERROR"], [None, "ERROR"]]
 
     fields = [["Previous Close"], 
               ["Open"],
@@ -115,12 +130,3 @@ def scrape_stock(abbr):
     fields[-1].append(re.split('>|<|\n',str(price_find))[-3])
 
     return refine_values(fields)
-    #return render(abbr, 'Front_end/search.html', fields)
-
-"""if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("ERROR: Expecting 1 command line argument")
-        exit()
-
-    summary = scrape_stock(sys.argv[1])
-    print(summary)"""

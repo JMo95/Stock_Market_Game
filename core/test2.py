@@ -1,3 +1,3 @@
 from scrape_data import *
 
-print("hi")
+print([1,2,3,4,5][:5-1])
