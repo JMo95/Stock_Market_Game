@@ -26,9 +26,17 @@ class PullStockView(APIView):
 	serializer_class = PullStockSerializer 
 
 	def load_elements(self):
-		detail = [ {"name": detail.stock_name, "market_cap": scrape_stock(detail.stock_name)[4]} 
+		details = []
+		for detail in PullStock.objects.all():
+			stock_details = scrape_stock(detail.stock_name)
+			details.append({"Name": detail.stock_name, "Daily Low": stock_details[0], "Daily High": stock_details[1], "Volume": stock_details[2], "Avg. Volume": stock_details[3], 
+			"Market Cap": stock_details[4], "PE Ratio (TTM)": stock_details[5], "Price": stock_details[6]})
+
+		"""detail = [ {"name": detail.stock_name, "elements": scrape_stock(detail.stock_name)} 
 		for detail in PullStock.objects.all()]
-		return detail
+		print(detail)"""
+		# Daily Low, Daily High, Volume, Avg. Volume, Market Cap, PE Ratio (TTM), Price
+		return details
 
 	def get(self, request):
 		return Response(self.load_elements()) 
@@ -71,9 +79,9 @@ def refine_values(summary):
     for i in [6,7,8,10,-1]:
         important_stats.append(summary[i])
 
-    hold_range = summary[4][1].split(' ')
-    important_stats.insert(0, ['Daily High', hold_range[2]])
-    important_stats.insert(0, ['Daily Low', hold_range[0]])
+    hold_range = summary[4].split(' ')
+    important_stats.insert(0, hold_range[2])
+    important_stats.insert(0, hold_range[0])
     return important_stats
 
 def scrape_stock(abbr):
@@ -89,25 +97,9 @@ def scrape_stock(abbr):
     try:
         value_elems = results.find_all('td', class_='Ta(end) Fw(600) Lh(14px)')
     except:
-        return [[None, "ERROR"], [None, "ERROR"], [None, "ERROR"], [None, "ERROR"], [None, "ERROR"], [None, "ERROR"], [None, "ERROR"]]
+        return ["ERROR", "ERROR", "ERROR", "ERROR", "ERROR", "ERROR", "ERROR"]
 
-    fields = [["Previous Close"], 
-              ["Open"],
-              ["Bid"],
-              ["Ask"],
-              ["Day's Range"],
-              ["52 Week Range"],
-              ["Volume"],
-              ["Avg. Volume"],
-              ["Market Cap"],
-              ["Beta (5Y Monthly)"],
-              ["PE Ratio (TTM)"],
-              ["EPS (TTM)"],
-              ["Earnings Date"],
-              ["Forward Dividend & Yield"],
-              ["Ex-Dividend Date"],
-              ["1y Target Est"],
-              ["Price"]]
+    fields = []
 
     i=0
     for value_elem in value_elems: #loops through classes containing important info
@@ -124,9 +116,9 @@ def scrape_stock(abbr):
 
         for k in indexes: #loops through every needed index
             value = value + re.split('>|<|\n',str(value_elem))[k]
-        fields[i].append(value)
+        fields.append(value)
         i+=1
 
-    fields[-1].append(re.split('>|<|\n',str(price_find))[-3])
+    fields.append(re.split('>|<|\n',str(price_find))[-3])
 
     return refine_values(fields)

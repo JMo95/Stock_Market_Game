@@ -16,9 +16,9 @@ def refine_values(summary):
     for i in [6,7,8,10,-1]:
         important_stats.append(summary[i])
 
-    hold_range = summary[4][1].split(' ')
-    important_stats.insert(0, ['Daily High', hold_range[2]])
-    important_stats.insert(0, ['Daily Low', hold_range[0]])
+    hold_range = summary[4].split(' ')
+    important_stats.insert(0, hold_range[2])
+    important_stats.insert(0, hold_range[0])
     return important_stats
 
 def scrape_stock(abbr):
@@ -34,10 +34,10 @@ def scrape_stock(abbr):
     try:
         value_elems = results.find_all('td', class_='Ta(end) Fw(600) Lh(14px)')
     except:
-        print("ERROR: Abbreviation Not Found")
-        exit()
+        return ["ERROR", "ERROR", "ERROR", "ERROR", "ERROR", "ERROR", "ERROR"]
 
-    fields = [["Previous Close"], 
+    fields = []
+    """fields = [["Previous Close"], 
               ["Open"],
               ["Bid"],
               ["Ask"],
@@ -53,7 +53,7 @@ def scrape_stock(abbr):
               ["Forward Dividend & Yield"],
               ["Ex-Dividend Date"],
               ["1y Target Est"],
-              ["Price"]]
+              ["Price"]]"""
 
     i=0
     for value_elem in value_elems: #loops through classes containing important info
@@ -70,13 +70,12 @@ def scrape_stock(abbr):
 
         for k in indexes: #loops through every needed index
             value = value + re.split('>|<|\n',str(value_elem))[k]
-        fields[i].append(value)
+        fields.append(value)
         i+=1
 
-    fields[-1].append(re.split('>|<|\n',str(price_find))[-3])
+    fields.append(re.split('>|<|\n',str(price_find))[-3])
 
     return refine_values(fields)
-    #return render(abbr, 'Front_end/search.html', fields)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
