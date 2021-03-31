@@ -5,6 +5,8 @@ from users.models import TrackedStock
 from users.models import Investor
 from users.models import FakeStock
 from users.models import LimitOrders
+from users.models import FakeOptionChain
+from users.models import Option
 from django.core import serializers
 from django.http import JsonResponse
 import pandas as pd
@@ -18,7 +20,7 @@ import schedule
 def register(request):
     if request.method == 'POST':
         newUser = User.objects.create_user(request.POST.get("user"),request.POST.get("email"), request.POST.get("password"))
-        Investor.objects.create(user=newUser,money=10000)
+        Investor.objects.create(user=newUser,money=100000)
     return HttpResponse("created user")
 
 def changeName(request):
@@ -172,6 +174,119 @@ def getUser(request):
 def getStockPrice(symbol):
     return FakeStock.objects.filter(Symbol=symbol).values("Price")[0]["Price"]
 
+def BuyOption(request):
+    if request.method == 'POST':
+        Cuser = request.POST.get("user")
+        currentUser = User.objects.filter(username=Cuser)[0]
+        inv = Investor.objects.filter(user=currentUser)
+        money = list((inv.values('money')))
+        Price = getOptionPrice(request.POST.get("Symbol"),request.POST.get("Strike"),request.POST.get("ExperationDate"))
+        Strike = int(request.POST.get("Strike"))
+        if request.POST.get("type") == 'call':
+            if money[0]["money"] > (Price + Strike)*100*int(request.POST.get("Quantity")):
+                Option.objects.create(Symbol=request.POST.get("Symbol"),LastPrice=Price,StrikePrice=Strike,ExperationDate=request.POST.get("ExperationDate"),Account=currentUser,Quantity=request.POST.get("Quantity"),holder=True,Type='call')
+                inv.update(money = money[0]["money"]-(Price + Strike)*100*int(request.POST.get("Quantity")))
+                return HttpResponse("buy call")
+            else:
+                return HttpResponse("no enought money")
+        if request.POST.get("type") == 'put':
+            if money[0]["money"] > Price*100:
+                 Option.objects.create(Symbol=request.POST.get("Symbol"),LastPrice=Price,StrikePrice=Strike,ExperationDate=request.POST.get("ExperationDate"),Account=currentUser,Quantity=request.POST.get("Quantity"),holder=True,Type='put')
+                 inv.update(money = money[0]["money"]-Price*100)
+                 return HttpResponse("buy put")
+            else:
+                return HttpResponse("no enought money")
+            
+def SellOption(request):
+    if request.method == 'POST':
+        Cuser = request.POST.get("user")
+        currentUser = User.objects.filter(username=Cuser)[0]
+        inv = Investor.objects.filter(user=currentUser)
+        money = list((inv.values('money')))
+        Price = getOptionPrice(request.POST.get("Symbol"),request.POST.get("Strike"),request.POST.get("ExperationDate"))
+        Strike = int(request.POST.get("Strike"))
+        if request.POST.get("type") == 'call':
+            if TrackedStock.objects.filter(Symbol=request.POST.get("Symbol"),Account=currentUser).values("Quantity")[0]["Quantity"]  > int(request.POST.get("Quantity"))*100:
+                Option.objects.create(Symbol=request.POST.get("Symbol"),LastPrice=Price,StrikePrice=Strike,ExperationDate=request.POST.get("ExperationDate"),Account=currentUser,Quantity=request.POST.get("Quantity"),holder=False,Type='call')
+                return HttpResponse("sell call")
+            else:
+                return HttpResponse("no enough stock")
+        if request.POST.get("type") == 'put':
+            if money[0]["money"] >  Strike*100*int(request.POST.get("Quantity")):
+                 Option.objects.create(Symbol=request.POST.get("Symbol"),LastPrice=Price,StrikePrice=Strike,ExperationDate=request.POST.get("ExperationDate"),Account=currentUser,Quantity=request.POST.get("Quantity"),holder=False,Type='put')
+                 return HttpResponse("sell put")
+            else:
+                return HttpResponse("no enought money")
+            
+def ExerciseBuyOption(request):
+    if request.method == 'POST':
+        CurrentOption = list(Option.objects.filter(id=request.POST.get("id")).values())
+        
+        if len(CurrentOption) == 1:
+            inv = Investor.objects.filter(user=CurrentOption[0]["Account_id"])
+            currentUser = User.objects.filter(id=CurrentOption[0]["Account_id"])[0]
+            money = list((inv.values('money')))
+            if CurrentOption[0]["holder"] == True and CurrentOption[0]["Type"] == 'call':
+               AddStock(CurrentOption[0]["Symbol"],0,100,currentUser)
+               Option.objects.filter(id=request.POST.get("id")).delete()
+               
+            if CurrentOption[0]["holder"] == True and CurrentOption[0]["Type"] == 'put':
+               Quantity = TrackedStock.objects.filter(Symbol=CurrentOption[0]["Symbol"],Account=currentUser).values("Quantity")[0]["Quantity"]
+               if Quantity > 100:
+                    TrackedStock.objects.filter(Symbol=CurrentOption[0]["Symbol"],Account=currentUser).update(Quantity=Quantity-100)
+                    Option.objects.filter(id=request.POST.get("id")).delete()
+                    inv.update(money = money[0]["money"]+CurrentOption[0]["StrikePrice"]*100)
+               elif Quantity == 100:
+                    TrackedStock.objects.filter(Symbol=CurrentOption[0]["Symbol"],Account=currentUser).Delete()
+                    Option.objects.filter(id=request.POST.get("id")).delete()
+                    inv.update(money = money[0]["money"]+CurrentOption[0]["StrikePrice"]*100)
+               else:
+                    return HttpResponse("not enough stock to exerice option")
+               
+            return HttpResponse("ExeriseOption")
+        
+        
+def ExerciseSellOption(request):
+    if request.method == 'POST':
+        CurrentOption = list(Option.objects.filter(id=request.POST.get("id")).values())
+        
+        if len(CurrentOption) == 1:
+            inv = Investor.objects.filter(user=CurrentOption[0]["Account_id"])
+            currentUser = User.objects.filter(id=CurrentOption[0]["Account_id"])[0]
+            money = list((inv.values('money')))
+            if CurrentOption[0]["holder"] == False and CurrentOption[0]["Type"] == 'call':
+                Quantity = TrackedStock.objects.filter(Symbol=CurrentOption[0]["Symbol"],Account=currentUser).values("Quantity")[0]["Quantity"]
+                if Quantity > 100:
+                    TrackedStock.objects.filter(Symbol=CurrentOption[0]["Symbol"],Account=currentUser).update(Quantity=Quantity-100)
+                    Option.objects.filter(id=request.POST.get("id")).delete()
+                    inv.update(money = money[0]["money"]+CurrentOption[0]["StrikePrice"]*100 + CurrentOption[0]["LastPrice"]*100)
+                elif Quantity == 100:
+                    TrackedStock.objects.filter(Symbol=CurrentOption[0]["Symbol"],Account=currentUser).Delete()
+                    inv.update(money = money[0]["money"]+CurrentOption[0]["StrikePrice"]*100 + CurrentOption[0]["LastPrice"]*100)
+                    Option.objects.filter(id=request.POST.get("id")).delete()
+                    
+                else:
+                   AddStock(CurrentOption[0]["Symbol"],getStockPrice("APL"),100,currentUser)
+                   Option.objects.filter(id=request.POST.get("id")).delete()
+                   TrackedStock.objects.filter(Symbol=CurrentOption[0]["Symbol"],Account=currentUser).Delete()
+                   inv.update(money = money[0]["money"]+CurrentOption[0]["StrikePrice"]*100 + CurrentOption[0]["LastPrice"]*100)
+                   Option.objects.filter(id=request.POST.get("id")).delete()
+               
+            if CurrentOption[0]["holder"] == False and CurrentOption[0]["Type"] == 'put':
+               AddStock(CurrentOption[0]["Symbol"],0,100,currentUser)
+               inv.update(money = money[0]["money"]-CurrentOption[0]["StrikePrice"]*100 + CurrentOption[0]["LastPrice"]*100)
+               Option.objects.filter(id=request.POST.get("id")).delete()
+               
+            return HttpResponse("ExeriseOption")
+            
+
+def getOptionPrice(symbol,strike,exp):
+    return FakeOptionChain.objects.filter(Symbol=symbol,StrikePrice=strike,ExperationDate=exp).values("LastPrice")[0]["LastPrice"]
+
+def getOptionByUser(request):
+    return JsonResponse(list(Option.objects.filter(Account=User.objects.filter(username=request.POST.get("user"))[0]).values()),safe=False)
+
+
 def updateOrders():
     print("Test Limit")
     limits = list(LimitOrders.objects.all().order_by('Symbol').values_list('Symbol','Price','Stop','Type','Quantity','Account','id','OrginalPrice'))
@@ -263,19 +378,19 @@ def testlmit(request):
     
     #for x in range(len(stonks)):
        #  AddStock(stonks[x][0],0,1000,User.objects.filter(username='jake').values("id")[0]['id'])
-    LimitOrders.objects.all().delete()
-    LimitOrders.objects.create(Symbol="APL",Price=getStockPrice("APL")-getStockPrice("APL")*.05,Account=User.objects.filter(username='jake')[0],Type='BL',Stop=0,Quantity=15)
-    LimitOrders.objects.create(Symbol="T",Price=getStockPrice("T")+getStockPrice("T")*.05,Account=User.objects.filter(username='jake')[0],Type='BSL',Stop=getStockPrice("T")+getStockPrice("T")*.1,Quantity=15)
-    LimitOrders.objects.create(Symbol="COX",Price=getStockPrice("COX")+getStockPrice("COX")*.05,Account=User.objects.filter(username='jake')[0],Type='BSM',Stop=105,Quantity=15)
-    LimitOrders.objects.create(Symbol="CHP",Price=7,Account=User.objects.filter(username='jake')[0],Type='BTP',Stop=100000,Quantity=15)
-    LimitOrders.objects.create(Symbol="GME",Price=10,Account=User.objects.filter(username='jake')[0],Type='BTD',Stop=100000,Quantity=15)
-    LimitOrders.objects.create(Symbol="AMC",Price=getStockPrice("AMC")+getStockPrice("AMC")*.05,Account=User.objects.filter(username='jake')[0],Type='SL',Stop=0,Quantity=15)
-    LimitOrders.objects.create(Symbol="AMZ",Price=getStockPrice("AMZ")-getStockPrice("AMZ")*.05,Account=User.objects.filter(username='jake')[0],Type='SSL',Stop=getStockPrice("AMZ")-getStockPrice("AMZ")*.1,Quantity=15)
-    LimitOrders.objects.create(Symbol="GOOG",Price=getStockPrice("GOOG")-getStockPrice("GOOG")*.05,Account=User.objects.filter(username='jake')[0],Type='SSM',Stop=450,Quantity=15)
-    LimitOrders.objects.create(Symbol="APL",Price=5,Account=User.objects.filter(username='jake')[0],Type='STP',Stop=0,Quantity=15)
-    LimitOrders.objects.create(Symbol="T",Price=8,Account=User.objects.filter(username='jake')[0],Type='STD',Stop=0,Quantity=15)
+    #LimitOrders.objects.all().delete()
+    #LimitOrders.objects.create(Symbol="APL",Price=getStockPrice("APL")-getStockPrice("APL")*.05,Account=User.objects.filter(username='jake')[0],Type='BL',Stop=0,Quantity=15)
+    #LimitOrders.objects.create(Symbol="T",Price=getStockPrice("T")+getStockPrice("T")*.05,Account=User.objects.filter(username='jake')[0],Type='BSL',Stop=getStockPrice("T")+getStockPrice("T")*.1,Quantity=15)
+    #LimitOrders.objects.create(Symbol="COX",Price=getStockPrice("COX")+getStockPrice("COX")*.05,Account=User.objects.filter(username='jake')#[0],Type='BSM',Stop=105,Quantity=15)
+    #LimitOrders.objects.create(Symbol="CHP",Price=7,Account=User.objects.filter(username='jake')[0],Type='BTP',Stop=100000,Quantity=15)
+    #LimitOrders.objects.create(Symbol="GME",Price=10,Account=User.objects.filter(username='jake')[0],Type='BTD',Stop=100000,Quantity=15)
+    #LimitOrders.objects.create(Symbol="AMC",Price=getStockPrice("AMC")+getStockPrice("AMC")*.05,Account=User.objects.filter(username='jake')[0],Type='SL',Stop=0,Quantity=15)
+    #LimitOrders.objects.create(Symbol="AMZ",Price=getStockPrice("AMZ")-getStockPrice("AMZ")*.05,Account=User.objects.filter(username='jake')[0],Type='SSL',Stop=getStockPrice("AMZ")-getStockPrice("AMZ")*.1,Quantity=15)
+    #LimitOrders.objects.create(Symbol="GOOG",Price=getStockPrice("GOOG")-getStockPrice("GOOG")*.05,Account=User.objects.filter(username='jake')[0],Type='SSM',Stop=450,Quantity=15)
+    #LimitOrders.objects.create(Symbol="APL",Price=5,Account=User.objects.filter(username='jake')[0],Type='STP',Stop=0,Quantity=15)
+    #LimitOrders.objects.create(Symbol="T",Price=8,Account=User.objects.filter(username='jake')[0],Type='STD',Stop=0,Quantity=15)
 
-    #updateOrders()
+    updateOrders()
     return HttpResponse("l")
 
 
@@ -303,6 +418,10 @@ def makeStock(request):
         stocks = list(FakeStock.objects.all().values('Symbol','Price'))
         return JsonResponse(stocks, safe=False)
     
+def makeOptionChain(request):
+    if request.method == 'GET':
+        FakeOptionChain.objects.create(Symbol='APL',LastPrice=11.5,StrikePrice=110,ExperationDate='2012-09-04 05:00:00')
+        return JsonResponse(list(FakeOptionChain.objects.all().values()), safe=False)
     
 def run_continuously(interval=1):
     cease_continuous_run = threading.Event()

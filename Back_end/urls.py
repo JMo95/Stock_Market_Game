@@ -30,8 +30,13 @@ urlpatterns = [
     path('getOrders/', userViews.getOrders),
     path('sellStockLimit/', userViews.sellStockLimit),
     path('cancelStockLimit/', userViews.cancelStockLimit),
+    path('getOptions/', userViews.getOptionByUser),
+     path('SellOption/', userViews.SellOption),
     path('startsheduler/', userViews.startsheduler),
+    path('ExerciseBuyOption/', userViews.ExerciseBuyOption),
+    path('ExerciseSellOption/', userViews.ExerciseSellOption),
     path('getHistoricalStockPrice/', userViews.getHistoricalStockPrice),
+    path('BuyOption/', userViews.BuyOption),
     path('test/', userViews.testlmit),
     path('makestock/', userViews.makeStock),
     

@@ -26,3 +26,20 @@ class LimitOrders(models.Model):
     Account = models.ForeignKey(User,on_delete=models.CASCADE)
     Type = models.CharField(max_length=3,default=None)
     
+    
+class FakeOptionChain(models.Model):
+    Symbol = models.CharField(max_length=4)
+    LastPrice = models.FloatField(default=0)
+    StrikePrice = models.FloatField(default=0)
+    ExperationDate = models.DateTimeField()
+    
+    
+class Option(models.Model):
+    Symbol = models.CharField(max_length=4)
+    LastPrice = models.FloatField(default=0)
+    StrikePrice = models.FloatField(default=0)
+    ExperationDate = models.DateTimeField()
+    Account = models.ForeignKey(User,on_delete=models.CASCADE)
+    Quantity = models.IntegerField(default=0)
+    holder = models.BooleanField(default=True)
+    Type = models.CharField(max_length=4,default='')
