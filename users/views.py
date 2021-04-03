@@ -36,7 +36,7 @@ def delete(request):
 
 def buyStock(request):
     if request.method == 'POST':
-        Quantity = int(request.POST.get("Quantity"))
+        Quantity = int(request.POST.get("quantity"))
         Symbol = request.POST.get("stock")
         Cuser = request.POST.get("user")
         currentUser = User.objects.filter(username=Cuser)[0]
@@ -59,12 +59,12 @@ def buyStock(request):
         
 def buyStockLimit(request):
     if request.method == 'POST':
-        Quantity = int(request.POST.get("Quantity"))
+        Quantity = int(request.POST.get("quantity"))
         Symbol = request.POST.get("stock")
         Cuser = request.POST.get("user")
         Price = int(request.POST.get("price"))
-        Stop = int(request.POST.get("Stop"))
-        Type = request.POST.get("Type")
+        Stop = int(request.POST.get("stop"))
+        Type = request.POST.get("type")
         currentUser = User.objects.filter(username=Cuser)[0]
         inv = Investor.objects.filter(user=currentUser)
         money = list((inv.values('money')))
@@ -94,7 +94,7 @@ def getStocks(request):
     
 def sellStock(request):
     if request.method == 'POST':
-        Quantity = int(request.POST.get("Quantity"))
+        Quantity = int(request.POST.get("quantity"))
         Symbol = request.POST.get("stock")
         Cuser = request.POST.get("user")
         currentUser = User.objects.filter(username=Cuser)[0]
@@ -118,12 +118,12 @@ def sellStock(request):
     
 def sellStockLimit(request):
     if request.method == 'POST':
-        Quantity = int(request.POST.get("Quantity"))
+        Quantity = int(request.POST.get("quantity"))
         Symbol = request.POST.get("stock")
         Cuser = request.POST.get("user")
         Price = int(request.POST.get("price"))
-        Stop = int(request.POST.get("Stop"))
-        Type = request.POST.get("Type")
+        Stop = int(request.POST.get("stop"))
+        Type = request.POST.get("type")
         currentUser = User.objects.filter(username=Cuser)[0]
         TStock = TrackedStock.objects.filter(Account=currentUser,Symbol=request.POST.get("stock"))
         if TStock.count() > 0 and TStock.values()[0]["Quantity"] >= Quantity:
@@ -180,18 +180,18 @@ def BuyOption(request):
         currentUser = User.objects.filter(username=Cuser)[0]
         inv = Investor.objects.filter(user=currentUser)
         money = list((inv.values('money')))
-        Price = getOptionPrice(request.POST.get("Symbol"),request.POST.get("Strike"),request.POST.get("ExperationDate"))
-        Strike = int(request.POST.get("Strike"))
+        Price = getOptionPrice(request.POST.get("symbol"),request.POST.get("strike"),request.POST.get("experationDate"))
+        Strike = int(request.POST.get("strike"))
         if request.POST.get("type") == 'call':
-            if money[0]["money"] > (Price + Strike)*100*int(request.POST.get("Quantity")):
-                Option.objects.create(Symbol=request.POST.get("Symbol"),LastPrice=Price,StrikePrice=Strike,ExperationDate=request.POST.get("ExperationDate"),Account=currentUser,Quantity=request.POST.get("Quantity"),holder=True,Type='call')
-                inv.update(money = money[0]["money"]-(Price + Strike)*100*int(request.POST.get("Quantity")))
+            if money[0]["money"] > (Price + Strike)*100*int(request.POST.get("quantity")):
+                Option.objects.create(Symbol=request.POST.get("symbol"),LastPrice=Price,StrikePrice=Strike,ExperationDate=request.POST.get("experationDate"),Account=currentUser,Quantity=request.POST.get("quantity"),holder=True,Type='call')
+                inv.update(money = money[0]["money"]-(Price + Strike)*100*int(request.POST.get("quantity")))
                 return HttpResponse("buy call")
             else:
                 return HttpResponse("no enought money")
         if request.POST.get("type") == 'put':
             if money[0]["money"] > Price*100:
-                 Option.objects.create(Symbol=request.POST.get("Symbol"),LastPrice=Price,StrikePrice=Strike,ExperationDate=request.POST.get("ExperationDate"),Account=currentUser,Quantity=request.POST.get("Quantity"),holder=True,Type='put')
+                 Option.objects.create(Symbol=request.POST.get("symbol"),LastPrice=Price,StrikePrice=Strike,ExperationDate=request.POST.get("experationDate"),Account=currentUser,Quantity=request.POST.get("quantity"),holder=True,Type='put')
                  inv.update(money = money[0]["money"]-Price*100)
                  return HttpResponse("buy put")
             else:
@@ -203,17 +203,17 @@ def SellOption(request):
         currentUser = User.objects.filter(username=Cuser)[0]
         inv = Investor.objects.filter(user=currentUser)
         money = list((inv.values('money')))
-        Price = getOptionPrice(request.POST.get("Symbol"),request.POST.get("Strike"),request.POST.get("ExperationDate"))
-        Strike = int(request.POST.get("Strike"))
+        Price = getOptionPrice(request.POST.get("symbol"),request.POST.get("strike"),request.POST.get("experationDate"))
+        Strike = int(request.POST.get("strike"))
         if request.POST.get("type") == 'call':
-            if TrackedStock.objects.filter(Symbol=request.POST.get("Symbol"),Account=currentUser).count() > 0 and TrackedStock.objects.filter(Symbol=request.POST.get("Symbol"),Account=currentUser).values("Quantity")[0]["Quantity"]  >= int(request.POST.get("Quantity"))*100:
-                Option.objects.create(Symbol=request.POST.get("Symbol"),LastPrice=Price,StrikePrice=Strike,ExperationDate=request.POST.get("ExperationDate"),Account=currentUser,Quantity=request.POST.get("Quantity"),holder=False,Type='call')
+            if TrackedStock.objects.filter(Symbol=request.POST.get("symbol"),Account=currentUser).count() > 0 and TrackedStock.objects.filter(Symbol=request.POST.get("symbol"),Account=currentUser).values("Quantity")[0]["Quantity"]  >= int(request.POST.get("quantity"))*100:
+                Option.objects.create(Symbol=request.POST.get("symbol"),LastPrice=Price,StrikePrice=Strike,ExperationDate=request.POST.get("experationDate"),Account=currentUser,Quantity=request.POST.get("quantity"),holder=False,Type='call')
                 return HttpResponse("sell call")
             else:
                 return HttpResponse("no enough stock")
         if request.POST.get("type") == 'put':
-            if money[0]["money"] >  Strike*100*int(request.POST.get("Quantity")):
-                 Option.objects.create(Symbol=request.POST.get("Symbol"),LastPrice=Price,StrikePrice=Strike,ExperationDate=request.POST.get("ExperationDate"),Account=currentUser,Quantity=request.POST.get("Quantity"),holder=False,Type='put')
+            if money[0]["money"] >  Strike*100*int(request.POST.get("quantity")):
+                 Option.objects.create(Symbol=request.POST.get("symbol"),LastPrice=Price,StrikePrice=Strike,ExperationDate=request.POST.get("experationDate"),Account=currentUser,Quantity=request.POST.get("quantity"),holder=False,Type='put')
                  return HttpResponse("sell put")
             else:
                 return HttpResponse("no enought money")
