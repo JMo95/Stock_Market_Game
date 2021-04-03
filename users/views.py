@@ -206,7 +206,7 @@ def SellOption(request):
         Price = getOptionPrice(request.POST.get("Symbol"),request.POST.get("Strike"),request.POST.get("ExperationDate"))
         Strike = int(request.POST.get("Strike"))
         if request.POST.get("type") == 'call':
-            if TrackedStock.objects.filter(Symbol=request.POST.get("Symbol"),Account=currentUser).values("Quantity")[0]["Quantity"]  > int(request.POST.get("Quantity"))*100:
+            if TrackedStock.objects.filter(Symbol=request.POST.get("Symbol"),Account=currentUser).count() > 0 and TrackedStock.objects.filter(Symbol=request.POST.get("Symbol"),Account=currentUser).values("Quantity")[0]["Quantity"]  >= int(request.POST.get("Quantity"))*100:
                 Option.objects.create(Symbol=request.POST.get("Symbol"),LastPrice=Price,StrikePrice=Strike,ExperationDate=request.POST.get("ExperationDate"),Account=currentUser,Quantity=request.POST.get("Quantity"),holder=False,Type='call')
                 return HttpResponse("sell call")
             else:
@@ -227,7 +227,7 @@ def ExerciseBuyOption(request):
             currentUser = User.objects.filter(id=CurrentOption[0]["Account_id"])[0]
             money = list((inv.values('money')))
             if CurrentOption[0]["holder"] == True and CurrentOption[0]["Type"] == 'call':
-               AddStock(CurrentOption[0]["Symbol"],0,100,currentUser)
+               AddStock(CurrentOption[0]["Symbol"],0,100,CurrentOption[0]["Account_id"])
                Option.objects.filter(id=request.POST.get("id")).delete()
                
             if CurrentOption[0]["holder"] == True and CurrentOption[0]["Type"] == 'put':
@@ -237,7 +237,7 @@ def ExerciseBuyOption(request):
                     Option.objects.filter(id=request.POST.get("id")).delete()
                     inv.update(money = money[0]["money"]+CurrentOption[0]["StrikePrice"]*100)
                elif Quantity == 100:
-                    TrackedStock.objects.filter(Symbol=CurrentOption[0]["Symbol"],Account=currentUser).Delete()
+                    TrackedStock.objects.filter(Symbol=CurrentOption[0]["Symbol"],Account=currentUser).delete()
                     Option.objects.filter(id=request.POST.get("id")).delete()
                     inv.update(money = money[0]["money"]+CurrentOption[0]["StrikePrice"]*100)
                else:
@@ -255,25 +255,28 @@ def ExerciseSellOption(request):
             currentUser = User.objects.filter(id=CurrentOption[0]["Account_id"])[0]
             money = list((inv.values('money')))
             if CurrentOption[0]["holder"] == False and CurrentOption[0]["Type"] == 'call':
-                Quantity = TrackedStock.objects.filter(Symbol=CurrentOption[0]["Symbol"],Account=currentUser).values("Quantity")[0]["Quantity"]
+                if TrackedStock.objects.filter(Symbol=CurrentOption[0]["Symbol"],Account=currentUser).count() > 0:
+                    Quantity = TrackedStock.objects.filter(Symbol=CurrentOption[0]["Symbol"],Account=currentUser).values("Quantity")[0]["Quantity"]
+                else:
+                    Quantity = 0
                 if Quantity > 100:
                     TrackedStock.objects.filter(Symbol=CurrentOption[0]["Symbol"],Account=currentUser).update(Quantity=Quantity-100)
                     Option.objects.filter(id=request.POST.get("id")).delete()
                     inv.update(money = money[0]["money"]+CurrentOption[0]["StrikePrice"]*100 + CurrentOption[0]["LastPrice"]*100)
                 elif Quantity == 100:
-                    TrackedStock.objects.filter(Symbol=CurrentOption[0]["Symbol"],Account=currentUser).Delete()
+                    TrackedStock.objects.filter(Symbol=CurrentOption[0]["Symbol"],Account=currentUser).delete()
                     inv.update(money = money[0]["money"]+CurrentOption[0]["StrikePrice"]*100 + CurrentOption[0]["LastPrice"]*100)
                     Option.objects.filter(id=request.POST.get("id")).delete()
                     
                 else:
-                   AddStock(CurrentOption[0]["Symbol"],getStockPrice("APL"),100,currentUser)
+                   AddStock(CurrentOption[0]["Symbol"],0,100,CurrentOption[0]["Account_id"])
                    Option.objects.filter(id=request.POST.get("id")).delete()
-                   TrackedStock.objects.filter(Symbol=CurrentOption[0]["Symbol"],Account=currentUser).Delete()
-                   inv.update(money = money[0]["money"]+CurrentOption[0]["StrikePrice"]*100 + CurrentOption[0]["LastPrice"]*100)
+                   TrackedStock.objects.filter(Symbol=CurrentOption[0]["Symbol"],Account=currentUser).delete()
+                   inv.update(money = money[0]["money"]+(CurrentOption[0]["StrikePrice"]-getStockPrice(CurrentOption[0]["Symbol"]))*100 + CurrentOption[0]["LastPrice"]*100)
                    Option.objects.filter(id=request.POST.get("id")).delete()
                
             if CurrentOption[0]["holder"] == False and CurrentOption[0]["Type"] == 'put':
-               AddStock(CurrentOption[0]["Symbol"],0,100,currentUser)
+               AddStock(CurrentOption[0]["Symbol"],0,100,CurrentOption[0]["Account_id"])
                inv.update(money = money[0]["money"]-CurrentOption[0]["StrikePrice"]*100 + CurrentOption[0]["LastPrice"]*100)
                Option.objects.filter(id=request.POST.get("id")).delete()
                

@@ -299,8 +299,8 @@ class UserTests(TestCase):
         client = Client()
         res = client.post('/register/',{'user': 'testuser', 'email': 'testuser@test.com', 'password': 'test1234'})
         
-        FakeStock.objects.filter(Symbol='APL').update(Price=100)
-        
+        FakeStock.objects.filter(Symbol='APL').update(Price=0)
+        res = client.post('/addstock/',{'Quantity': '100', 'stock': 'APL', 'user': 'testuser'})
         res = client.post('/SellOption/',{'user': 'testuser', 'Symbol': 'APL', 'Strike': '110', 'ExperationDate': '2012-09-04T05:00:00Z', 'type': 'call', 'Quantity': '1'})
         
         
@@ -317,7 +317,87 @@ class UserTests(TestCase):
         
         
         self.assertEqual(Option.objects.filter(Symbol='APL',holder=False,Type='put',Account=User.objects.filter(username='testuser')[0]).count(),1)
-        self.assertEqual(Investor.objects.filter(user=User.objects.filter(username='testuser')[0]).values('money')[0]["money"],100000-11000)
+        
+    def test_Stock_Exercise_Buy_option_call(self):
+        client = Client()
+        res = client.post('/register/',{'user': 'testuser', 'email': 'testuser@test.com', 'password': 'test1234'})
+        
+        res = client.post('/BuyOption/',{'user': 'testuser', 'Symbol': 'APL', 'Strike': '110', 'ExperationDate': '2012-09-04T05:00:00Z', 'type': 'call', 'Quantity': '1'})
+        
+        res = client.post('/ExerciseBuyOption/',{'id':Option.objects.filter(Account=User.objects.filter(username='testuser')[0]).values("id")[0]["id"] })
+        
+        
+        self.assertEqual(Option.objects.filter(Symbol='APL',holder=True,Type='call',Account=User.objects.filter(username='testuser')[0]).count(),0)
+        self.assertEqual(TrackedStock.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').values('Quantity')[0]["Quantity"], 100)
+        self.assertEqual(Investor.objects.filter(user=User.objects.filter(username='testuser')[0]).values('money')[0]["money"],100000-12150)
+    
+    
+    def test_Stock_Exercise_Buy_option_put(self):
+        client = Client()
+        res = client.post('/register/',{'user': 'testuser', 'email': 'testuser@test.com', 'password': 'test1234'})
+        
+        FakeStock.objects.filter(Symbol='APL').update(Price=0)
+        res = client.post('/addstock/',{'Quantity': '100', 'stock': 'APL', 'user': 'testuser'})
+        res = client.post('/BuyOption/',{'user': 'testuser', 'Symbol': 'APL', 'Strike': '110', 'ExperationDate': '2012-09-04T05:00:00Z', 'type': 'put', 'Quantity': '1'})
+        
+        res = client.post('/ExerciseBuyOption/',{'id':Option.objects.filter(Account=User.objects.filter(username='testuser')[0]).values("id")[0]["id"] })
+            
+        
+        self.assertEqual(Option.objects.filter(Symbol='APL',holder=True,Type='put',Account=User.objects.filter(username='testuser')[0]).count(),0)
+        self.assertEqual(Investor.objects.filter(user=User.objects.filter(username='testuser')[0]).values('money')[0]["money"],100000+11000-1150)
+        self.assertEqual(TrackedStock.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').count(), 0)
+        
+        
+    def test_Stock_Exercise_Sell_option_call(self):
+        client = Client()
+        res = client.post('/register/',{'user': 'testuser', 'email': 'testuser@test.com', 'password': 'test1234'})
+        
+        FakeStock.objects.filter(Symbol='APL').update(Price=0)
+        res = client.post('/addstock/',{'Quantity': '100', 'stock': 'APL', 'user': 'testuser'})
+        
+        res = client.post('/SellOption/',{'user': 'testuser', 'Symbol': 'APL', 'Strike': '110', 'ExperationDate': '2012-09-04T05:00:00Z', 'type': 'call', 'Quantity': '1'})
+        
+        res = client.post('/ExerciseSellOption/',{'id':Option.objects.filter(Account=User.objects.filter(username='testuser')[0]).values("id")[0]["id"] })
+            
+        
+        self.assertEqual(Option.objects.filter(Symbol='APL',holder=False,Type='call',Account=User.objects.filter(username='testuser')[0]).count(),0)
+        self.assertEqual(Investor.objects.filter(user=User.objects.filter(username='testuser')[0]).values('money')[0]["money"],100000+11000+1150)
+        self.assertEqual(TrackedStock.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').count(), 0)
+        
+    def test_Stock_Exercise_Sell_option_call_no_stock(self):
+        client = Client()
+        res = client.post('/register/',{'user': 'testuser', 'email': 'testuser@test.com', 'password': 'test1234'})
+        
+        FakeStock.objects.filter(Symbol='APL').update(Price=0)
+        res = client.post('/addstock/',{'Quantity': '100', 'stock': 'APL', 'user': 'testuser'})
+        
+        
+        
+        res = client.post('/SellOption/',{'user': 'testuser', 'Symbol': 'APL', 'Strike': '110', 'ExperationDate': '2012-09-04T05:00:00Z', 'type': 'call', 'Quantity': '1'})
+        
+        res = client.post('/sellStock/',{'Quantity': '100', 'stock': 'APL', 'user': 'testuser'})
+        FakeStock.objects.filter(Symbol='APL').update(Price=150)
+        res = client.post('/ExerciseSellOption/',{'id':Option.objects.filter(Account=User.objects.filter(username='testuser')[0]).values("id")[0]["id"] })
+            
+        
+        self.assertEqual(Option.objects.filter(Symbol='APL',holder=False,Type='call',Account=User.objects.filter(username='testuser')[0]).count(),0)
+        self.assertEqual(Investor.objects.filter(user=User.objects.filter(username='testuser')[0]).values('money')[0]["money"],100000-4000+1150)
+        self.assertEqual(TrackedStock.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').count(), 0)
+        
+        
+    def test_Stock_Exercise_Sell_option_put(self):
+        client = Client()
+        res = client.post('/register/',{'user': 'testuser', 'email': 'testuser@test.com', 'password': 'test1234'})
+        
+        res = client.post('/SellOption/',{'user': 'testuser', 'Symbol': 'APL', 'Strike': '110', 'ExperationDate': '2012-09-04T05:00:00Z', 'type': 'put', 'Quantity': '1'})
+        
+        res = client.post('/ExerciseSellOption/',{'id':Option.objects.filter(Account=User.objects.filter(username='testuser')[0]).values("id")[0]["id"] })
+            
+        
+        self.assertEqual(Option.objects.filter(Symbol='APL',holder=True,Type='put',Account=User.objects.filter(username='testuser')[0]).count(),0)
+        self.assertEqual(Investor.objects.filter(user=User.objects.filter(username='testuser')[0]).values('money')[0]["money"],100000-11000+1150)
+        self.assertEqual(TrackedStock.objects.filter(Account=User.objects.filter(username='testuser')[0],Symbol='APL').values('Quantity')[0]["Quantity"], 100)
+    
     
         
         
