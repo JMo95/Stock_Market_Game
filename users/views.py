@@ -9,12 +9,15 @@ from users.models import FakeOptionChain
 from users.models import Option
 from django.core import serializers
 from django.http import JsonResponse
+from django.contrib.auth.hashers import check_password
+from django.conf import settings
 import pandas as pd
 import datetime as dt
 import time as t
 import random
 import threading
 import time
+import jwt
 import schedule
 
 def register(request):
@@ -33,12 +36,71 @@ def delete(request):
         User.objects.filter(username = request.POST.get("user")).delete()
     return HttpResponse("deleted users")
 
+def login(request):
+    username = request.POST.get("username")
+    password = request.POST.get("password")
+    
+    UserQuery = User.objects.filter(username=username)
+    if UserQuery.count() == 1:
+        passhash = UserQuery.values("password")[0]["password"]
+        if check_password(password,passhash):
+            exptime = dt.datetime.now() + dt.timedelta(minutes=30)
+            data = {'username' : username, 'password': passhash , 'exptime': exptime.strftime("%a, %d %b %Y %H:%M:%S +0000")}
+            token = {'token': jwt.encode(data,settings.SECRET_KEY)}
+            return JsonResponse(token, safe=False)
+        else:
+            return HttpResponse("incorrect password")
+    else:
+        return HttpResponse("User Does not exist")
+    
+    
+def authenticate(request):
+    token  = request.headers.get('Authorization')[7:]
+    
+    
+    try:
+        data = jwt.decode(token, settings.SECRET_KEY,['HS256'])
+    except:
+        return HttpResponse("could not decode token")
+   
+    keys = list(data.keys())
+    if len(data) == 3 and keys[0] == 'username' and keys[1] == 'password' and keys[2] == 'exptime':
+        AuthUser = User.objects.filter(username=data["username"],password=data["password"])
+    else:
+         return HttpResponse("could not decode token")
+    experation = dt.datetime.strptime(data["exptime"], ("%a, %d %b %Y %H:%M:%S +0000"))
+    if experation < dt.datetime.now():
+        return HttpResponse("Expired token")
+    if AuthUser.count() != 1:
+        return HttpResponse("invaild token")
+    return JsonResponse(data, safe=False)
+
+
+def authenticateUser(token):    
+    try:
+        data = jwt.decode(token, settings.SECRET_KEY,['HS256'])
+    except:
+        return None
+    keys = list(data.keys())
+    if len(data) == 3 and keys[0] == 'username' and keys[1] == 'password' and keys[2] == 'exptime':
+        AuthUser = User.objects.filter(username=data["username"],password=data["password"])
+    else:
+         return None
+    experation = dt.datetime.strptime(data["exptime"], ("%a, %d %b %Y %H:%M:%S +0000"))
+    if experation < dt.datetime.now():
+        return None
+    if AuthUser.count() != 1:
+        return None
+    return data["username"]
 
 def buyStock(request):
+    Cuser = authenticateUser(request.headers.get('Authorization')[7:])
+    if Cuser == None:
+        return HttpResponse("not authenticated")
     if request.method == 'POST':
         Quantity = int(request.POST.get("quantity"))
         Symbol = request.POST.get("stock")
-        Cuser = request.POST.get("user")
+        
         currentUser = User.objects.filter(username=Cuser)[0]
         inv = Investor.objects.filter(user=currentUser)
         money = list((inv.values('money')))
@@ -166,7 +228,7 @@ def cancelStockLimit(request):
     
 def getUser(request):
     if request.method == 'GET':
-        Userinfo = list(Investor.objects.filter(user= User.objects.filter(username=request.GET.get("username"))[0]).values('user__username','user__email',"money") )
+        Userinfo = list(Investor.objects.filter(user= User.objects.filter(username=request.GET.get("username"))[0]).values('user__username','user__email',"money","user__password") )
         #Userinfo = list(User.objects.filter(username=request.GET.get("username")).values('username' , 'email'))
         return JsonResponse(Userinfo, safe=False)
     

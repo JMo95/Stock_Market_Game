@@ -131,6 +131,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+SECRET_KEY = 'iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2V'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
