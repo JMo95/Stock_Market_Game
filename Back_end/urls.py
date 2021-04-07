@@ -17,12 +17,16 @@ Including another URLconf
 from django.contrib import admin 
 from django.urls import path, include 
 from django.conf.urls import url 
-from core.views import ReactView, ReactView_U, ReactView_S
+from core.views import ReactView, ReactView_U, ReactView_S, current_person, React_PersonList
+from rest_framework_jwt.views import obtain_jwt_token
 
 
 urlpatterns = [ 
     path('admin/', admin.site.urls), 
+    path('token-auth/', obtain_jwt_token),
     path('wel/', ReactView.as_view(), name="something"), 
     path('wel2/', ReactView_U.as_view(), name="something"),
     path('wel3/', ReactView_S.as_view(), name="something"),
+    path('current_user/', current_person ),
+    path('users/', React_PersonList.as_view())
 ]

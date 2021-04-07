@@ -12,7 +12,8 @@ class Stock_C extends React.Component {
         price: 0.0,
 	    Company: "", 
 	    desciption: "",
-        date: ""
+        date: "",
+	    ticker: "",
     }; 
   
     componentDidMount() { 
@@ -56,14 +57,16 @@ class Stock_C extends React.Component {
   
     handleSubmit = (e) => { 
         e.preventDefault(); 
+        console.log("Stock submit happen")
   
         axios 
-            .post("http://localhost:8000/wel2/", { 
+            .post("http://localhost:8000/wel3/", { 
                 name: this.state.name,
                 price: this.state.price,
 	            Company: this.state.Company, 
 	            desciption: this.state.desciption,
                 date: this.state.date,
+                ticker: this.state.ticker,
             }) 
             .then((res) => { 
                 this.setState({ 
@@ -71,7 +74,8 @@ class Stock_C extends React.Component {
                     price: 0.0,
             	    Company: "", 
             	    desciption: "",
-                    date: ""
+                    date: "", 
+                    ticker: "",
                 }); 
             }) 
             .catch((err) => {}); 
@@ -106,7 +110,7 @@ class Stock_C extends React.Component {
                             </span> 
                         </div> 
                         <input type="text" className="form-control" 
-                               placeholder="Name of the Poet/Author"
+                               placeholder="Type of the Company"
                                aria-label="Username"
                                aria-describedby="basic-addon1"
                                value={this.state.Company} name="Company"
@@ -123,7 +127,7 @@ class Stock_C extends React.Component {
                             </span> 
                         </div> 
                         <input type="text" className="form-control" 
-                               placeholder="Name of the Poet/Author"
+                               placeholder="Price of Stock"
                                aria-label="Username"
                                aria-describedby="basic-addon1"
                                value={this.state.price} name="price"
@@ -133,13 +137,13 @@ class Stock_C extends React.Component {
                     <div className="input-group mb-3"> 
                         <div className="input-group-prepend"> 
                             <span className="input-group-text"> 
-                                Descripition  
+                                Description  
                             </span> 
                         </div> 
                         <textarea className="form-control " 
                                   aria-label="With textarea"
                                   placeholder="Tell us what you think of ....." 
-                                  value={this.state.desciption} name="description" 
+                                  value={this.state.description} name="description" 
                                   onChange={this.handleInput}> 
                         </textarea> 
                     </div> 
@@ -152,13 +156,29 @@ class Stock_C extends React.Component {
                                 date{" "} 
                             </span> 
                         </div> 
-                        <input type="text" className="form-control" 
-                               placeholder="Name of the Poet/Author"
+                        <input type="date" className="form-control" 
+                               placeholder="Age published"
                                aria-label="Username"
                                aria-describedby="basic-addon1"
                                value={this.state.date} name="date"
                                onChange={this.handleInput} /> 
                     </div> 
+
+                    <div className="input-group mb-3"> 
+                        <div className="input-group-prepend"> 
+                            <span className="input-group-text"
+                                  id="basic-addon1"> 
+                                {" "} 
+                                ticker{" "} 
+                            </span> 
+                        </div> 
+                        <input type="text" className="form-control" 
+                               placeholder="..."
+                               aria-label="Username"
+                               aria-describedby="basic-addon1"
+                               value={this.state.ticker} name="ticker"
+                               onChange={this.handleInput} /> 
+                    </div>
 
   
                     <button type="submit" className="btn btn-primary mb-5"> 

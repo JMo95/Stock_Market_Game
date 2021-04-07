@@ -1,8 +1,13 @@
+from django.http import HttpResponseRedirect
 from django.shortcuts import render 
 from rest_framework.views import APIView 
-from . models import React, User, Stock
-from rest_framework.response import Response 
-from . serializer import ReactSerializer, ReactUser, ReactStock
+from . models import React, User, Stock, Person
+# , PersonS_A
+from rest_framework.response import Response
+from . serializer import ReactSerializer, ReactUser, ReactStock, ReactPerson_Auth, ReactPerson_S
+from rest_framework import permissions, status
+from rest_framework.permissions import IsAdminUser, DjangoModelPermissions
+from rest_framework.decorators import api_view
 # Create your views here. 
 
 class ReactView(APIView): 
@@ -53,6 +58,42 @@ class ReactView_S(APIView):
 		if serializerU.is_valid(raise_exception=True): 
 			serializerU.save() 
 			return Response(serializerU.data) 
+
+
+
+################################################################################
+################################################################################
+################################################################################
+
+
+
+
+
+@api_view(['GET'])
+def current_person(request):
+    """
+    Determine the current user by their token, and return their data
+    """
+    
+    serializer = ReactPerson_S(request.user)
+    return Response(serializer.data)
+
+
+class React_PersonList(APIView):
+    """
+    Create a new user. It's called 'UserList' because normally we'd have a get
+    method here too, for retrieving a list of all User objects.
+    """
+
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request, format=None):
+        serializer = ReactPerson_Auth(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 

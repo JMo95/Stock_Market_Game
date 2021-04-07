@@ -76,6 +76,11 @@ class dataB extends React.Component {
             }) 
             .catch((err) => {}); 
     }; 
+    OnSubmit2(e) {
+        e.preventDefault();
+
+        console.log(this.state.name)
+    }
   
     render() { 
         return ( 
@@ -193,7 +198,8 @@ class dataB extends React.Component {
                         </div> 
                         <span className="border border-primary "></span> 
                     </div> 
-                ))} 
+                ))}
+                {/* <button type="submit" className="btn btn-primary mb-5" onClick={this.OnSubmit2}> submit2</button>  */}
             </div> 
         ); 
     } 

@@ -41,8 +41,6 @@ state = {
 
 
 
-
-
 handleInput = (e) => { 
     this.setState({ 
         [e.target.name]: e.target.value, 
@@ -101,7 +99,7 @@ handleSubmit = (e) => {
                     <div className="reg_text">Name: </div> 
                   </div>
                   <div className="reg_box3">
-                    <input className="reg_Base" type="text"  placeholder = "Name..."  name="firstname" 
+                    <input className="reg_Base2" type="text"  placeholder = "Name..."  name="firstname" 
                           value={this.state.firstname} onChange={this.handleInput}  />
                   </div>
                 </div>
@@ -111,7 +109,7 @@ handleSubmit = (e) => {
                       <div className="reg_text">Last Name: </div>
                     </div>
                     <div className="reg_box3">
-                      <input className="reg_Base" type="text"  placeholder = "Name..."  name="lastname" 
+                      <input className="reg_Base2" type="text"  placeholder = "Name..."  name="lastname" 
                             value={this.state.lastname} onChange={this.handleInput} />
                     </div>
                   </div>
@@ -121,7 +119,7 @@ handleSubmit = (e) => {
                       <div className="reg_text">UserName: </div>
                     </div>
                     <div className="reg_box3">
-                      <input className="reg_Base" type="text"  placeholder = "Name..."  name="name" 
+                      <input className="reg_Base2" type="text"  placeholder = "Name..."  name="name" 
                             value={this.state.name} onChange={this.handleInput} />
                     </div>
                   </div>
@@ -131,7 +129,7 @@ handleSubmit = (e) => {
                       <div className="reg_text">Deposit: </div>
                     </div>
                     <div className="reg_box3">
-                      <input className="reg_Base" type="text"  placeholder = "Name..."  name="deposit"  
+                      <input className="reg_Base2" type="text"  placeholder = "Name..."  name="deposit"  
                             value={this.state.deposit} onChange={this.handleInput}/>
                     </div>
                   </div>
@@ -141,7 +139,7 @@ handleSubmit = (e) => {
                       <div className="reg_text">Password: </div>
                     </div>
                     <div className="reg_box3">
-                      <input className="Nav_Base" type="password"  placeholder = "Name..."  name="password"  
+                      <input className="reg_Base2" type="password"  placeholder = "Name..."  name="password"  
                               value={this.state.password} onChange={this.handleInput}/>
                     </div>
                   </div>
@@ -151,7 +149,7 @@ handleSubmit = (e) => {
                       <div className="reg_text">Confirm Password: </div>
                     </div>
                     <div className="reg_box3">
-                      <input className="reg_Base" type="password"  placeholder = "Name..."  name="conf_passw" 
+                      <input className="reg_Base2" type="password"  placeholder = "Name..."  name="conf_passw" 
                               value={this.state.conf_passw} onChange={this.handleInput}/>
                     </div>
                   </div>

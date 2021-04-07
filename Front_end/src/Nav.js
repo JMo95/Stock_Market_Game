@@ -31,7 +31,7 @@ class BootstrapNavbar extends React.Component{
       }
       )
       console.log(this.state.search_A)
-      this.props.search_F(this.state.search_A);
+      // this.props.search_F(this.state.search_A);
   }
 
 
@@ -40,7 +40,7 @@ class BootstrapNavbar extends React.Component{
     event.preventDefault();
       console.log("Submit happen");
       console.log(this.state.search_A);
-      this.props.search_F(this.state.search_A);
+      // this.props.search_F(this.state.search_A);
       alert('A value was submitted: ' + this.state.search_A);
       window.location.href = '/search';
   }
