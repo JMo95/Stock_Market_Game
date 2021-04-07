@@ -55,7 +55,7 @@ def login(request):
     
     
 def authenticate(request):
-    token  = request.headers.get('Authorization')[7:]
+    token  = request.headers.get('Authorization')
     
     
     try:
@@ -76,7 +76,11 @@ def authenticate(request):
     return JsonResponse(data, safe=False)
 
 
-def authenticateUser(token):    
+def authenticateUser(token):  
+    if(token != None):
+        token = token[7:]
+    else:
+        return None
     try:
         data = jwt.decode(token, settings.SECRET_KEY,['HS256'])
     except:
@@ -94,7 +98,7 @@ def authenticateUser(token):
     return data["username"]
 
 def buyStock(request):
-    Cuser = authenticateUser(request.headers.get('Authorization')[7:])
+    Cuser = authenticateUser(request.headers.get('Authorization'))
     if Cuser == None:
         return HttpResponse("not authenticated")
     if request.method == 'POST':
@@ -120,10 +124,12 @@ def buyStock(request):
         
         
 def buyStockLimit(request):
+    Cuser = authenticateUser(request.headers.get('Authorization'))
+    if Cuser == None:
+        return HttpResponse("not authenticated")
     if request.method == 'POST':
         Quantity = int(request.POST.get("quantity"))
         Symbol = request.POST.get("stock")
-        Cuser = request.POST.get("user")
         Price = int(request.POST.get("price"))
         Stop = int(request.POST.get("stop"))
         Type = request.POST.get("type")
@@ -146,19 +152,27 @@ def buyStockLimit(request):
 
 def getOrders(request):
     if request.method == 'GET':
-        stocks = list(LimitOrders.objects.filter(Account=User.objects.filter(username=request.GET.get("username"))[0]).values('id','Symbol','Quantity','Stop','Price','Type'))
+        Cuser = authenticateUser(request.headers.get('Authorization'))
+        if Cuser == None:
+            return HttpResponse("not authenticated")
+        stocks = list(LimitOrders.objects.filter(Account=User.objects.filter(username=Cuser)[0]).values('id','Symbol','Quantity','Stop','Price','Type'))
         return JsonResponse(stocks, safe=False)
 
 def getStocks(request):
+    Cuser = authenticateUser(request.headers.get('Authorization'))
+    if Cuser == None:
+        return HttpResponse("not authenticated")
     if request.method == 'GET':
-        stocks = list(TrackedStock.objects.filter(Account=User.objects.filter(username=request.GET.get("username"))[0]).values('Symbol','Quantity'))
+        stocks = list(TrackedStock.objects.filter(Account=User.objects.filter(username=Cuser)[0]).values('Symbol','Quantity'))
         return JsonResponse(stocks, safe=False)
     
 def sellStock(request):
+    Cuser = authenticateUser(request.headers.get('Authorization'))
+    if Cuser == None:
+        return HttpResponse("not authenticated")
     if request.method == 'POST':
         Quantity = int(request.POST.get("quantity"))
         Symbol = request.POST.get("stock")
-        Cuser = request.POST.get("user")
         currentUser = User.objects.filter(username=Cuser)[0]
         inv = Investor.objects.filter(user=currentUser)
         money = list((inv.values('money')))
@@ -179,10 +193,12 @@ def sellStock(request):
     
     
 def sellStockLimit(request):
+    Cuser = authenticateUser(request.headers.get('Authorization'))
+    if Cuser == None:
+        return HttpResponse("not authenticated")
     if request.method == 'POST':
         Quantity = int(request.POST.get("quantity"))
         Symbol = request.POST.get("stock")
-        Cuser = request.POST.get("user")
         Price = int(request.POST.get("price"))
         Stop = int(request.POST.get("stop"))
         Type = request.POST.get("type")
@@ -201,8 +217,10 @@ def sellStockLimit(request):
         
     
 def cancelStockLimit(request):
+    Cuser = authenticateUser(request.headers.get('Authorization'))
+    if Cuser == None:
+        return HttpResponse("not authenticated")
     if request.method == 'POST':
-        Cuser = request.POST.get("user")
         id = request.POST.get("id")
         currentUser = User.objects.filter(username=Cuser)[0]
         order = LimitOrders.objects.filter(Account=currentUser,id=id)
@@ -227,8 +245,11 @@ def cancelStockLimit(request):
     
     
 def getUser(request):
+    Cuser = authenticateUser(request.headers.get('Authorization'))
+    if Cuser == None:
+        return HttpResponse("not authenticated")
     if request.method == 'GET':
-        Userinfo = list(Investor.objects.filter(user= User.objects.filter(username=request.GET.get("username"))[0]).values('user__username','user__email',"money","user__password") )
+        Userinfo = list(Investor.objects.filter(user= User.objects.filter(username=Cuser)[0]).values('user__username','user__email',"money","user__password") )
         #Userinfo = list(User.objects.filter(username=request.GET.get("username")).values('username' , 'email'))
         return JsonResponse(Userinfo, safe=False)
     
@@ -237,8 +258,10 @@ def getStockPrice(symbol):
     return FakeStock.objects.filter(Symbol=symbol).values("Price")[0]["Price"]
 
 def BuyOption(request):
+    Cuser = authenticateUser(request.headers.get('Authorization'))
+    if Cuser == None:
+        return HttpResponse("not authenticated")
     if request.method == 'POST':
-        Cuser = request.POST.get("user")
         currentUser = User.objects.filter(username=Cuser)[0]
         inv = Investor.objects.filter(user=currentUser)
         money = list((inv.values('money')))
@@ -260,8 +283,10 @@ def BuyOption(request):
                 return HttpResponse("no enought money")
             
 def SellOption(request):
+    Cuser = authenticateUser(request.headers.get('Authorization'))
+    if Cuser == None:
+        return HttpResponse("not authenticated")
     if request.method == 'POST':
-        Cuser = request.POST.get("user")
         currentUser = User.objects.filter(username=Cuser)[0]
         inv = Investor.objects.filter(user=currentUser)
         money = list((inv.values('money')))
@@ -281,6 +306,9 @@ def SellOption(request):
                 return HttpResponse("no enought money")
             
 def ExerciseBuyOption(request):
+    Cuser = authenticateUser(request.headers.get('Authorization'))
+    if Cuser == None:
+        return HttpResponse("not authenticated")
     if request.method == 'POST':
         CurrentOption = list(Option.objects.filter(id=request.POST.get("id")).values())
         
@@ -349,7 +377,10 @@ def getOptionPrice(symbol,strike,exp):
     return FakeOptionChain.objects.filter(Symbol=symbol,StrikePrice=strike,ExperationDate=exp).values("LastPrice")[0]["LastPrice"]
 
 def getOptionByUser(request):
-    return JsonResponse(list(Option.objects.filter(Account=User.objects.filter(username=request.POST.get("user"))[0]).values()),safe=False)
+    Cuser = authenticateUser(request.headers.get('Authorization'))
+    if Cuser == None:
+        return HttpResponse("not authenticated")
+    return JsonResponse(list(Option.objects.filter(Account=User.objects.filter(username=Cuser)[0]).values()),safe=False)
 
 
 def updateOrders():
