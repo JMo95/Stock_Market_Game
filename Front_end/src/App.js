@@ -2,8 +2,8 @@ import './css/App.css';
 import React from "react";
 // import {render} from "react-dom";
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import BootstrapNavbar from './Nav';
-import useToken from './Tokens/useToken';
+import BootstrapNavbar from './Navbar/Nav';
+// import useToken from './Tokens/useToken';
 //import {Router, Route} from "react-router";
 
 import landing from "./Component/Landing";
@@ -14,6 +14,9 @@ import log_in from "./Component/Log_in";
 import dataB from "./Component/dataB";
 import anonymous from "./Component/dataB/anonymous";
 import stock_C from "./Component/dataB/stock_collection";
+import auth_sign from "./Component/auth/Signup";
+import auth_log_out from "./Component/auth/Logout";
+import auth_log_in from "./Component/auth/Log_in";
 
 //import { AuthProvider } from './components/Auth';
 
@@ -23,7 +26,7 @@ function App()
 // class App extends React.Component
 {
 
-  const {token, setToken } = useToken();
+  // const {token, setToken } = useToken();
   // constructor(props) 
   // {
     
@@ -56,6 +59,7 @@ function App()
 
   return (
     <div className="App"> 
+    
       {/* <BootstrapNavbar search_F = {handleSearch()}  /> */}
       <BootstrapNavbar  />
       {handle_pass_Search()}
@@ -77,7 +81,10 @@ function App()
               <Route exact path="/dataB" component={dataB} />
               <Route exact path="/anonymous" component={anonymous} />
               <Route exact path="/stock_C" component={stock_C} />
-                          
+              <Route exact path="/auth/Sign_up" component={auth_sign} />
+              <Route exact path="/auth/Logout" component={auth_log_out} />
+              <Route exact path="/auth/Log_in" component={auth_log_in} />
+              
             </Switch>
           </div>  
         </div>

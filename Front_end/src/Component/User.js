@@ -1,32 +1,33 @@
-import React from "react";
+import React,  { useState, useEffect } from "react";
 import "./../css/User.css"
 import search_p from "./../Image/BUTTON_search.png"
 
 
-class User extends React.Component
+const User = () => 
 {
-        constructor(props) 
-        {
-                super(props);
-        };
 
-        handleClick_Search2 = () =>
-        {
-            console.log("OpertionX");
-            alert('Operation search');
-            window.location.href = '/search';
-        }
+  useEffect(() => {
+    if (localStorage.getItem('token') === null) {
+      window.location.replace('http://localhost:3000/');
+    } else {
+      
+    }
+  }, []);
 
-        handleSubmit_search(event)
-         {
+  function handleClick_Search2(){
+    console.log("OpertionX");
+    alert('Operation search');
+    window.location.href = '/search';
+  }
+
+  function handleSubmit_search(event){
           event.preventDefault();
             console.log("Submit happen");
             alert('A value was submitted: ');
             window.location.href = '/search';
-        }
+  }
 
-        render()
-        {
+ 
           return (
                 <div className="App">
                   <header className="App-header">
@@ -56,7 +57,7 @@ class User extends React.Component
                         <h2 className="user_text"> Search </h2>
                         <img src={[search_p]} className="land_Icon" align='center' onClick={()=> this.handleClick_Search2()} alt="standard search button" />
                         <p className="user_text"> --------- </p>
-                        <form className="user_Base" onSubmit={this.handleSubmit_search}>
+                        <form className="user_Base" onSubmit={handleSubmit_search}>
                           <input className="user_Base" type="text"  placeholder = "Seach ...."  name="name"  />
                         </form>
                       </div>
@@ -66,7 +67,7 @@ class User extends React.Component
 
                 </div>
               );
-        }
+        
 }
 
 export default User;

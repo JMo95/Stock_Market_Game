@@ -13,20 +13,16 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-
-from django.contrib import admin 
-from django.urls import path, include 
+from django.contrib import admin
+from django.urls import path, include
 from django.conf.urls import url 
 from core.views import ReactView, ReactView_U, ReactView_S, current_person, React_PersonList
 from rest_framework_jwt.views import obtain_jwt_token
 
-
-urlpatterns = [ 
-    path('admin/', admin.site.urls), 
-    path('token-auth/', obtain_jwt_token),
-    path('wel/', ReactView.as_view(), name="something"), 
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/v1/users/', include('users.urls')),
+    path('wel/', ReactView.as_view(), name="core"), 
     path('wel2/', ReactView_U.as_view(), name="something"),
     path('wel3/', ReactView_S.as_view(), name="something"),
-    path('current_user/', current_person ),
-    path('users/', React_PersonList.as_view())
 ]
