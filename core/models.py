@@ -12,3 +12,6 @@ class PullStock(models.Model):
 
 	def __str__(self):
     	 return super().__str__()
+
+class Options(models.Model):
+	stock_name = models.CharField(max_length=10)

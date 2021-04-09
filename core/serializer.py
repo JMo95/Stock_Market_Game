@@ -10,3 +10,8 @@ class PullStockSerializer(serializers.ModelSerializer):
 	class Meta: 
 		model = PullStock 
 		fields = ['stock_name'] 
+
+class OptionsSerializer(serializers.ModelSerializer):
+	class Meta: 
+		model = Options 
+		fields = ['stock_name']

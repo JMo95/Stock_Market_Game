@@ -69,6 +69,39 @@ class PullStockView(APIView):
 	#line below kept for future use
 	#PullStock.objects.filter(id=id).delete()
 
+class OptionsView(APIView):
+
+	serializer_class = OptionsSerializer 
+
+	def load_elements(self, stk_name):
+		details = []
+		calls, puts = scrape_options(stk_name)
+		if calls:
+			for c in calls:
+				details.append({"Type": 'Call', "Name": c[0], "Last Trade Date": c[1], "Strike": c[2], "Last Price": c[3], "Bid": c[4], "Ask": c[5], "% Change": c[6], "Volume": c[7], 
+				"Open Interest": c[8], "Implied Volatility": c[9]})
+		if puts:
+			for p in puts:
+				details.append({"Type": 'Put', "Name": c[0], "Last Trade Date": p[1], "Strike": p[2], "Last Price": p[3], "Bid": p[4], "Ask": p[5], "% Change": p[6], "Volume": p[7], 
+				"Open Interest": p[8], "Implied Volatility": p[9]})
+
+		return details
+
+	def get(self, request):
+		return Response(self.load_elements('CLOV')) 
+		#return Response(detail)
+
+	def post(self, request): 
+		serializer = OptionsSerializer(data=request.data) 
+		if serializer.is_valid(raise_exception=True): 
+			serializer.save()
+			return Response(self.load_elements(serializer.data['stock_name']))
+
+	def delete(self, request):
+		Options.objects.all().delete()
+		return Response(self.load_elements('CLOV'))
+		#return Response(detail)
+
 import re
 
 import requests
@@ -122,3 +155,33 @@ def scrape_stock(abbr):
     fields.append(re.split('>|<|\n',str(price_find))[-3])
 
     return refine_values(fields)
+
+def scrape_help(soup, back_text):
+    contracts = []
+    i=0
+    while True:
+        if soup.find('tr', class_='data-row' + str(i) + back_text):
+            contracts.append(soup.find('tr', class_='data-row' + str(i) + back_text))
+        else:
+            break
+        i+=1
+
+    divided_options = []
+    for con in contracts:
+        divided_options.append([])
+        for c in con:
+            divided_options[-1].append(c.text)
+    return divided_options
+
+def scrape_options(abbr):
+    URL = "https://finance.yahoo.com/quote/" + abbr + "/options?p=" + abbr #link to stock info
+    page = requests.get(URL) #scrape URL
+    soup = BeautifulSoup(page.content, 'html.parser') #set up parser
+
+    calls = scrape_help(soup, ' Bgc($hoverBgColor):h BdT Bdc($seperatorColor) H(33px) in-the-money Bgc($hoverBgColor)')
+    puts = scrape_help(soup, ' Bgc($hoverBgColor):h BdT Bdc($seperatorColor) H(33px)')
+
+    if not calls and not puts:
+        return None, None
+
+    return calls, puts

@@ -23,4 +23,5 @@ urlpatterns = [
     path('admin/', admin.site.urls), 
     path('wel/', ReactView.as_view(), name="something"), 
     path('scrape/', PullStockView.as_view(), name="something"),
+    path('options/', OptionsView.as_view(), name="something"),
 ]

@@ -77,10 +77,43 @@ def scrape_stock(abbr):
 
     return refine_values(fields)
 
+def scrape_help(soup, back_text):
+    contracts = []
+    i=0
+    while True:
+        if soup.find('tr', class_='data-row' + str(i) + back_text):
+            contracts.append(soup.find('tr', class_='data-row' + str(i) + back_text))
+        else:
+            break
+        i+=1
+
+    divided_options = []
+    for con in contracts:
+        divided_options.append([])
+        for c in con:
+            divided_options[-1].append(c.text)
+    return divided_options
+
+def scrape_options(abbr):
+    URL = "https://finance.yahoo.com/quote/" + abbr + "/options?p=" + abbr #link to stock info
+    page = requests.get(URL) #scrape URL
+    soup = BeautifulSoup(page.content, 'html.parser') #set up parser
+
+    calls = scrape_help(soup, ' Bgc($hoverBgColor):h BdT Bdc($seperatorColor) H(33px) in-the-money Bgc($hoverBgColor)')
+    puts = scrape_help(soup, ' Bgc($hoverBgColor):h BdT Bdc($seperatorColor) H(33px)')
+
+    if not calls and not puts:
+        return None, None
+
+    return calls, puts
+
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("ERROR: Expecting 1 command line argument")
         exit()
 
-    summary = scrape_stock(sys.argv[1])
-    print(summary)
+    calls, puts = scrape_options(sys.argv[1])
+    print(calls)
+    print(puts)
+    #summary = scrape_stock(sys.argv[1])
+    #print(summary)
