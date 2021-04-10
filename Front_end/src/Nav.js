@@ -87,19 +87,22 @@ class BootstrapNavbar extends React.Component{
                     <div className="col-md-12">
                         <Router>
                             <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
-                                <Navbar.Brand href="/">Stock Price Predictor</Navbar.Brand>
+                                <Navbar.Brand href="/">Beginner Trading</Navbar.Brand>
                                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                                 <Navbar.Collapse id="basic-navbar-nav">
                                     <Nav className="mr-auto">
                                     <Nav.Link href="/">Home</Nav.Link>
-                                    <Nav.Link href="/">Top Gainers</Nav.Link>
+                                    <Nav.Link href="/search">Search</Nav.Link>
+                                    <Nav.Link href="/Trading">Trade</Nav.Link>
                                     </Nav>
                                     <Nav>
+                                    {/*
                                     <Form inline onSubmit={this.handleSubmit}>
                                     <FormControl type="text" placeholder="Enter name or ticker" className="mr-sm-2"
                                     name="name"  value={this.state.search_A} onChange={this.handle_Change}/>
                                     <Button variant="outline-success" onClick={()=> handleClick_Search()} onClick={this.handleSubmit} >Submit</Button>
                                     </Form>
+                                    */}
                                     </Nav>
                                     <Nav className="ml-auto pr-5">
                                     <NavDropdown title="User" id="basic-nav-dropdown" className = "pr-5">
