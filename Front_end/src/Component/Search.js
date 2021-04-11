@@ -5,10 +5,6 @@ class search extends React.Component
   constructor(props) 
   {
     super(props);
-<<<<<<< HEAD
-  };
-
-=======
     this.state = { 
       search_for: this.props.Input,
       search_for_dynamic: ''
@@ -30,23 +26,12 @@ class search extends React.Component
   }
 
 
->>>>>>> main
   render()
   {
     return (
       <div className="App">
         <header className="App-header">
           <p>
-<<<<<<< HEAD
-            Enter the Abbreviation of a Stock below:
-          </p>
-          <form action="/user/" method="post">
-            <input id="abbr" type="text" name="abbr"/>
-            <button type="submit" className="btn btn-primary mb-5"> 
-              Submit 
-            </button> 
-          </form>
-=======
             Search
             Something is happening
           </p>
@@ -58,7 +43,6 @@ class search extends React.Component
           <p>
             Looking for {this.state.search_for_dynamic}
           </p>
->>>>>>> main
         </header>
       </div>
     );

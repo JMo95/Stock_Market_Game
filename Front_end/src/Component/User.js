@@ -1,9 +1,6 @@
 import React from "react";
-<<<<<<< HEAD
-=======
 import "./../css/User.css"
 import search_p from "./../Image/BUTTON_search.png"
->>>>>>> main
 
 
 class User extends React.Component
@@ -13,8 +10,6 @@ class User extends React.Component
                 super(props);
         };
 
-<<<<<<< HEAD
-=======
         handleClick_Search2 = () =>
         {
             console.log("OpertionX");
@@ -30,18 +25,11 @@ class User extends React.Component
             window.location.href = '/search';
         }
 
->>>>>>> main
         render()
         {
           return (
                 <div className="App">
                   <header className="App-header">
-<<<<<<< HEAD
-                    <p>
-                      User page.
-                    </p>
-                  </header>
-=======
                   <div className="user_box">   
                       <div className="user_box2">
                         <h2 className="user_text"> User -- NAME </h2>
@@ -76,7 +64,6 @@ class User extends React.Component
 
                   </header>
 
->>>>>>> main
                 </div>
               );
         }

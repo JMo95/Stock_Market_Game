@@ -1,6 +1,4 @@
 import React from "react";
-<<<<<<< HEAD
-=======
 import "./../css/Landing.css"
 //import pict from "./../Image/Stock.jfif"
 import search_p from "./../Image/BUTTON_search.png"
@@ -8,30 +6,10 @@ import {Button, Container, Row, Col, Table, Form, Card} from 'react-bootstrap'
 import token from './token';
 
 token.value = 'test123';
->>>>>>> main
 
 
 class landing extends React.Component
 {
-<<<<<<< HEAD
-        constructor(props) 
-        {
-                super(props);
-        };
-
-        render()
-        {
-          return (
-                <div className="App">
-                  <header className="App-header">
-                    <p>
-                      Landing page.
-                    </p>
-                  </header>
-                </div>
-              );
-        }
-=======
   constructor(props) 
   {
     super(props);
@@ -79,7 +57,6 @@ class landing extends React.Component
           </Container>
       );
   }
->>>>>>> main
 }
 
 export default landing;
