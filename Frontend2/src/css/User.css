@@ -1,0 +1,103 @@
+
+.user_box
+{
+    width: 100%;
+    height: 60%;
+    /* background-color: red; */
+    /* margin: 10px; */
+    /* display: inline-block; */
+    /* float:left; */
+    overflow: hidden;
+    position: relative;
+    top: 0; 
+}
+
+
+.user_text
+{
+    color: black
+}
+
+.user_text2
+{
+    color: white;
+    text-align: left;
+    font-weight: 900;
+    position: left
+
+}
+
+
+.user_box2
+{
+    width: 40%;
+    height: 40%;
+    background-color: rgb(246, 246, 246);
+    /* margin: 10px; */
+    display: inline-block;
+    /* float:left; */
+    overflow: hidden;
+    position: relative;
+    top: 0; 
+    border-radius: 20px !important;
+    padding: 10px;
+}
+
+.user_box3
+{
+    width: 40%;
+    height: 40%;
+    background-color: rgb(131, 136, 220);
+    margin: 20px;
+    /* float:right; */
+    display: inline-block;
+    padding: 9px;
+    overflow: hidden;
+    position: relative;
+    top: 0; 
+    border-radius: 25px !important;
+}
+
+.user_box4
+{
+    width: 80%;
+    height: 80%;
+    background-color: rgba(88, 78, 93, 0.6);
+    margin: 20px;
+    /* float:right; */
+    display: inline-block;
+    padding: 25px;
+    overflow: hidden;
+    position: relative;
+    top: 0; 
+    border-radius: 0px !important;
+}
+
+.user_hole2
+{
+    margin-left: 9px;
+    width: 2%;
+    display: inline-block;
+}
+
+.user_hole
+{
+    height: 2%;
+    top: 0;
+}
+
+.user_Icon{
+    /* float:left;
+    width: 100px;
+    margin-left: 0.5%; */
+    width: 40%;
+    /* flex: 1; */
+    display: inline-block;
+    /* width: undefined;
+    height: undefined; */
+    margin-top: 2px;
+    position: right;
+    margin-top: 8px;
+}
+
+

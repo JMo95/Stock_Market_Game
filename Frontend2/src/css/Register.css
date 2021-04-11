@@ -1,0 +1,98 @@
+.reg_Base
+{
+    /* display: inline-block; */
+    margin: 5px;
+}
+
+.reg_box
+{
+    width: 40%;
+    /* 
+    height: 60%; */
+    background-color: white;
+    /* margin: 10px; */
+    /*  */
+    /* float:left; */
+    overflow: hidden;
+    position: relative;
+    padding: 20px;
+    top: 0; 
+    border-radius: 25px !important;
+}
+
+
+.reg_text0
+{
+    color: black;
+    font-size: 24px;
+    /* display: inline-block; */
+    padding: 5px;
+    margin: 5px;
+}
+
+.reg_text
+{
+    color: black;
+    font-size: 18px;
+    /* display: inline-block; */
+    margin: 5px;
+    text-align: left;
+    float: left;
+}
+
+.reg_text2
+{
+    color: red;
+    font-size: 10;
+    /* display: inline-block; */
+    margin: 5px;
+    text-align: center;
+    float: center;
+}
+
+
+.reg_box2
+{
+    width: 90%;
+    height: 60%;
+    overflow: hidden;
+    position: relative;
+    top: 0; 
+    margin: 5px;
+    padding: 10px;
+}
+
+.reg_box3
+{
+    width: 40%;
+    overflow: hidden;
+    position: left;
+    display: inline-block;
+    top: 0; 
+}
+
+
+.reg_hole2
+{
+    margin-left: 9px;
+    width: 2%;
+    /* display: inline-block; */
+}
+
+.reg_hole0
+{
+    margin-left: 9px;
+    width: 2%;
+}
+
+.reg_hole
+{
+    height: 2%;
+    top: 0;
+}
+
+
+
+
+
+
