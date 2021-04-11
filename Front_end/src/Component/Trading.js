@@ -4,7 +4,6 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import axios from "axios";
 import token from './token';
 
-token.value = 'test123';
 
 class Trading extends React.Component
 {
@@ -18,21 +17,34 @@ class Trading extends React.Component
 
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         // Simple POST request with a JSON body using axios
-        const article = { title: 'React POST Request Example' };
+        //const article = { title: 'React POST Request Example' };
         const dataForm = new FormData();
-        dataForm.append('username', "stephenlu");
+        dataForm.append('username', "testwjose");
         dataForm.append('password', "password");
+        console.log("Component Did Mount");
         for (var value of dataForm.values()) {
             console.log(value);
         }
 
-        const headers = {
-            'Access-Control-Allow-Origin' : '*'
-        }
-        axios.post('https://stock-pipeli-users-fje2brrt8yy.herokuapp.com/login/', dataForm, {headers})
-            .then(response => this.setState({token : response.data}));
+
+        token.value = await axios.post('https://stock-pipeli-users-fje2brrt8yy.herokuapp.com/login/', dataForm, 
+        );
+
+        
+        console.log(token.value.data.token);
+
+        const userdataForm = new FormData();
+        userdataForm.append('username', "regtest");
+        
+        var res = await axios.post('https://stock-pipeli-users-fje2brrt8yy.herokuapp.com/getstocks/', userdataForm);
+
+        console.log(res);
+        
+
+        // axios.post('https://stock-pipeli-users-fje2brrt8yy.herokuapp.com/login/', dataForm)
+        //     .then(response => this.setState({token : response.data}));
     }
 
     render()
@@ -44,7 +56,7 @@ class Trading extends React.Component
                 <Container>
                     <Row>
                         <p>User Test</p>
-                        <p> {JSON.stringify(this.state.token)}</p>
+                        <p> </p>
                         <Col><h4>Balance: $420.69</h4></Col>
                         <Col></Col>
                         <Col></Col>
