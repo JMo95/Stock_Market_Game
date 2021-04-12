@@ -11,7 +11,7 @@ const Signup = () => {
 
   useEffect(() => {
     if (localStorage.getItem('token') !== null) {
-      window.location.replace('http://localhost:3000/');
+      // window.location.replace('http://localhost:3000/');
     } else {
       setLoading(false);
     }

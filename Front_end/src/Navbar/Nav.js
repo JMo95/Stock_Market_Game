@@ -1,7 +1,9 @@
 import React, { useState, useEffect, Fragment }  from 'react'
 import { BrowserRouter as Router,
     Switch, Route, useParams, } from "react-router-dom";
-  import { Navbar,Nav,NavDropdown,Form,FormControl,Button } from 'react-bootstrap'
+import { Navbar,Nav,NavDropdown,Form,FormControl,Button } from 'react-bootstrap'
+
+
 
 const BootstrapNavbar = () => {
 
@@ -104,7 +106,7 @@ const BootstrapNavbar = () => {
                                       :
                                       (
                                         <Nav className="ml-auto pr-5">
-                                          <NavDropdown title="WELCOME" id="basic-nav-dropdown" className = "pr-5">
+                                          <NavDropdown title=" Welcome" id="basic-nav-dropdown" className = "pr-5">
                                               <NavDropdown.Item href="/auth/Sign_up">Sign up</NavDropdown.Item>
                                               <NavDropdown.Item href="/auth/Log_in">Log In</NavDropdown.Item>
                                           </NavDropdown>
