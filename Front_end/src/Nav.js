@@ -105,7 +105,7 @@ const BootstrapNavbar = () => {
                                         <Nav className="ml-auto pr-5">
                                         <NavDropdown title="User" id="basic-nav-dropdown" className = "pr-5">
                                             <NavDropdown.Item href="/User">User Info</NavDropdown.Item>
-                                            <NavDropdown.Item href="/auth/log_out">Log Out</NavDropdown.Item>
+                                            <NavDropdown.Item href="/auth/Logout">Log Out</NavDropdown.Item>
                                         </NavDropdown>
                                         </Nav>
                                       )
