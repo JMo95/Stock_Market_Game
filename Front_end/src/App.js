@@ -12,6 +12,11 @@ import regist_P from "./Component/Register";
 import log_in from "./Component/Log_in";
 import dataB from "./Component/dataB";
 import Trading from "./Component/Trading";
+import auth_sign from "./Component/auth/Signup";
+import auth_log_out from "./Component/auth/Logout";
+import auth_log_in from "./Component/auth/Log_in";
+
+
 //import { AuthProvider } from './components/Auth';
 
 
@@ -60,6 +65,10 @@ class App extends React.Component
                           <Route exact path="/Register" component={regist_P} />
                           <Route exact path="/dataB" component={dataB} />
                           <Route exact path="/Trading" component={Trading} />
+
+                          <Route exact path="/auth/Sign_up" component={auth_sign} />
+                          <Route exact path="/auth/Logout" component={auth_log_out} />
+                          <Route exact path="/auth/Log_in" component={auth_log_in} />
                           
                       </Switch>
                     </div>  
