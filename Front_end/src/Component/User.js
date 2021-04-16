@@ -1,44 +1,117 @@
-import React from "react";
+import React, { useState, useEffect, Fragment }  from "react";
 import "./../css/User.css"
 import search_p from "./../Image/BUTTON_search.png"
 
 
-class User extends React.Component
-{
-        constructor(props) 
-        {
-                super(props);
-        };
 
-        handleClick_Search2 = () =>
-        {
-            console.log("OpertionX");
-            alert('Operation search');
-            window.location.href = '/search';
-        }
 
-        handleSubmit_search(event)
-         {
-          event.preventDefault();
-            console.log("Submit happen");
-            alert('A value was submitted: ');
-            window.location.href = '/search';
-        }
+const User = () => {
 
-        render()
-        {
-          return (
+  const [email, setEmail] = useState('')
+  const [money, setMoney] = useState('')
+  const [user, setUser] = useState('')
+  const [username, setUsername] = useState('')
+
+
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (localStorage.getItem('token') == null) {
+      window.location.replace('http://localhost:3000/');
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
+
+  const handleUser = e => {
+
+      var myHeaders = new Headers();
+      var bearer = "bearer "
+      // console.log("This is my bearer: ", bearer)
+      bearer += localStorage.getItem('token')
+      console.log("This is my bearer: ", bearer)
+      myHeaders.append("Authorization", bearer);
+
+      var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+      };
+
+      var tomato = {
+        "money": 0,
+        "user__email": "",
+        "user__username": "",
+      };
+      
+
+      
+      fetch("https://stock-pipeli-users-fje2brrt8yy.herokuapp.com/getuser/", requestOptions)
+      .then(response => response.json())
+      .then(function(result){
+        // console.log("This is a result: ", result[0])
+        // console.log("This is a map user: ", result[0].user__username)
+        // console.log("This is a map email: ", result[0].user__email)
+        // console.log("This is a username: ", result[0].getElementBy('user_username'))
+        // console.log("This is a result: ", result[0].user_username)
+        // tomato["user__username"] = result[0].user__username
+        // tomato.money = result[0].money
+        // tomato.user__email = result[0].user__email
+        setUsername(result[0].user__username)
+        setEmail(result[0].user__email)
+        setMoney(result[0].money)
+
+       } )
+      .catch(error => console.log('error', error));
+
+      console.log("This is a username Omega on =>  ", username)
+
+      // console.log("This is a result Omega on =>  ", tomato)
+      // console.log("This is a user_username on =>  ", tomato.user__username)
+      // console.log("This is a user__email on =>  ", tomato.user__email)
+      // console.log("This is a money on =>  ", tomato.money)
+
+
+    };
+
+
+
+        function handleClick_Search2() {
+          console.log("OpertionX");
+          alert('Operation search');
+          window.location.href = '/search';
+      }
+
+      function handleSubmit_search(event)
+      {
+        event.preventDefault();
+          console.log("Submit happen");
+          alert('A value was submitted: ');
+          window.location.href = '/search';
+      }
+  
+
+  return (
+
                 <div className="App">
+                  <div>BELLOW LAY YOUR TOKEN</div>
+          <div> { localStorage.getItem('token') } </div>
+          <div> This is the username: { username } </div>
+          {
+            handleUser()
+            // console.log("Print stuff: ",value)
+          }
                   <header className="App-header">
                   <div className="user_box">   
                       <div className="user_box2">
-                        <h2 className="user_text"> User -- NAME </h2>
+                        <h2 className="user_text"> { username }  </h2>
                         <div className="user_box4">
                             <h3> Profile </h3>
-                            this is personal info
-                            <p className="user_text2"> Name: </p>
-                            <p className="user_text2"> Usename: </p>
-                            <p className="user_text2"> Deposit money: </p>
+                            <p className="user_text2"> Name: {username}</p>
+                            <p className="user_text2"> Email: {email}</p>
+                            <p className="user_text2"> Deposit money: {money}</p>
                         </div>
 
                         <div className="user_box4">
@@ -54,9 +127,9 @@ class User extends React.Component
 
                       <div className="user_box2">
                         <h2 className="user_text"> Search </h2>
-                        <img src={[search_p]} className="land_Icon" align='center' onClick={()=> this.handleClick_Search2()} alt="standard search button" />
+                        <img src={[search_p]} className="land_Icon" align='center' onClick={()=> handleClick_Search2()} alt="standard search button" />
                         <p className="user_text"> --------- </p>
-                        <form className="user_Base" onSubmit={this.handleSubmit_search}>
+                        <form className="user_Base" onSubmit={handleSubmit_search}>
                           <input className="user_Base" type="text"  placeholder = "Seach ...."  name="name"  />
                         </form>
                       </div>
@@ -66,7 +139,7 @@ class User extends React.Component
 
                 </div>
               );
-        }
+        // }
 }
 
 export default User;

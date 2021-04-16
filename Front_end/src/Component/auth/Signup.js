@@ -97,7 +97,7 @@ const Signup = () => {
                             </div>
                         </div>
 
-                        <br />
+                        {/* <br /> */}
                         {/* <label htmlFor='password1'>Password:</label> <br /> */}
                         <div className="reg_box2">
                             <div className="reg_box3">
@@ -109,7 +109,7 @@ const Signup = () => {
                                         onChange={e => setPassword1(e.target.value)} required />{' '}
                             </div>
                         </div>
-                        <br />
+                        {/* <br /> */}
                         {/* <label htmlFor='password2'>Confirm password:</label> <br /> */}
 
 
@@ -125,7 +125,12 @@ const Signup = () => {
                     </div>
 
                     <br />
+                    {password2 == password1 && password1 != ""?
                     <input type='submit' value='Signup' />
+                    :
+                    <dic></dic>
+                    }
+                    
                 </form>
             </div>
       </header>
