@@ -13,11 +13,9 @@ const Trading = () => {
     
     const [money, setMoney] = useState('')
     const [bearerX, setbearerX] = useState('')
-    const [user, setUser] = useState('')
     const [username, setUsername] = useState('')
     const [stock_name, setStock_name] = useState('')
     const [quantity, setQuantity] = useState('')
-    const [price, setPrice] = useState('')
     const [loading, setLoading] = useState(true);
     const [errors, setErrors] = useState(false);
 
@@ -72,31 +70,6 @@ const Trading = () => {
              setErrors(true)
            });
 
-        ////////////////////////////////
-        //////////GET STOCK
-        ///////////////////////////////
-
-            // var formdata = new FormData();
-            // formdata.append("username", username);
-
-            // var requestOptions2 = {
-            // method: 'GET',
-            // headers: myHeaders,
-            // body: formdata,
-            // redirect: 'follow'
-            // };
-
-            // fetch("https://stock-pipeli-users-fje2brrt8yy.herokuapp.com/getstocks/", requestOptions2)
-            // .then(response => response.json())
-            // .then(function(result) 
-            //     {
-            //         console.log("This is our getstock", result)
-            //     })
-            // .catch(function(error){
-            //     console.log('error', error)
-            //     localStorage.clear()
-            //      setErrors(true)
-            //    });
 
     }, []);
   
@@ -190,7 +163,7 @@ const Trading = () => {
                         <Row>
                             <p>User Test</p>
                             <p> </p>
-                            <Col><h4>Balance: $420.69</h4></Col>
+                            <Col><h4>Balance: ${money}</h4></Col>
                             <Col></Col>
                             <Col></Col>
                         </Row>
