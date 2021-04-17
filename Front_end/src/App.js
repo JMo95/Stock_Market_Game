@@ -15,6 +15,7 @@ import Trading from "./Component/Trading";
 import auth_sign from "./Component/auth/Signup";
 import auth_log_out from "./Component/auth/Logout";
 import auth_log_in from "./Component/auth/Log_in";
+import get_stock from "./Component/table.js";
 
 
 //import { AuthProvider } from './components/Auth';
@@ -69,6 +70,7 @@ class App extends React.Component
                           <Route exact path="/auth/Sign_up" component={auth_sign} />
                           <Route exact path="/auth/Logout" component={auth_log_out} />
                           <Route exact path="/auth/Log_in" component={auth_log_in} />
+                          <Route exact path="/superman" component={get_stock} />
                           
                       </Switch>
                     </div>  

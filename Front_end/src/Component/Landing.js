@@ -3,7 +3,7 @@ import "./../css/Landing.css"
 //import pict from "./../Image/Stock.jfif"
 import search_p from "./../Image/BUTTON_search.png"
 import {Button, Container, Row, Col, Table, Form, Card} from 'react-bootstrap'
-import token from './token';
+import token from './table';
 
 token.value = 'test123';
 
