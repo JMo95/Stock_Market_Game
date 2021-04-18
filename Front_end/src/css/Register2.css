@@ -31,6 +31,16 @@
     border-radius: 25px !important;
 }
 
+.reg_box_text0
+{
+    color: black;
+    background-color: #f78b8bdf;
+    border-radius: 25px !important;
+    font-size: 32px;
+    /* display: inline-block; */
+    padding: 5px;
+    margin: 5px;
+}
 
 .reg_text0
 {

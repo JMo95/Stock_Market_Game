@@ -51,7 +51,11 @@ const Login = () => {
           setErrors(true);
         }
       })
-      .catch(error => console.log('error', error));
+      .catch(function(error)
+        {  
+          console.log('there is an error', error)
+          setErrors(true)
+        });
   };
 
   return (
@@ -59,7 +63,7 @@ const Login = () => {
         <header className="App-header">
             <div className="reg_box">
             {loading === false && <h1 className="reg_text0"> Login </h1>}
-            {errors === true && <h2 className="reg_text0">Cannot log in with provided credentials</h2>}
+            {errors === true ? <h2 className="reg_box_text0">Cannot log in with provided credentials</h2>: <div></div> }
             {loading === false && (
                 <form onSubmit={onSubmit}>
                     <div className="reg_box2">

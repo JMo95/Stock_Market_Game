@@ -1,6 +1,7 @@
 import React, { useState, useEffect, Fragment }  from "react";
 import "./../css/User.css"
 import search_p from "./../Image/BUTTON_search.png"
+import Stocks from './table';
 
 
 const User = () => {
@@ -143,7 +144,7 @@ const User = () => {
         <div> You had gotten Logout, your account has expired</div>
         :
         <div>
-<div className="user_box2">
+        <div className="user_box2">
             <h2 className="user_text"> { username }  </h2>
             <div className="user_box4">
               <h3> Profile </h3>
@@ -151,16 +152,16 @@ const User = () => {
               <p className="user_text2"> Email: {email}</p>
               <p className="user_text2"> Deposit money: {money}</p>
             </div>
-
-            <div className="user_box4">
-              <h3> Pin sotcks </h3>
-              <p className="user_text2"> Name: </p>
-              <p className="user_text2"> Usename: </p>
-              <p className="user_text2"> Deposit money: </p>
-            </div>
           </div>
 
           <div className="user_hole2"> </div>
+
+          <div className="user_box2_1" > 
+            <div className="user_box5">
+              <h3> Your stocks </h3>
+              <div> <Stocks /> </div>
+            </div>
+          </div>
 
           <div className="user_box2">
             <h2 className="user_text"> Search </h2>

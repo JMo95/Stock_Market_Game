@@ -147,6 +147,39 @@ const Trading = () => {
         .then(result => console.log(result))
         .catch(error => console.log('error', error));
 
+        window.location.reload();
+
+    }
+
+    function onSell(e)
+    {
+        console.log("Sucess happen on the user: ", username)
+        console.log("This is stock name: ", stock_name)
+        console.log("This is quantity: ", quantity)
+        console.log("This is money: ", money)
+
+        var myHeaders = new Headers();
+        myHeaders.append("Authorization", bearerX);
+
+        var formdata = new FormData();
+        formdata.append("quantity", quantity);
+        formdata.append("stock", stock_name);
+        formdata.append("user", username);
+
+        var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: formdata,
+        redirect: 'follow'
+        };
+
+        fetch("https://stock-pipeli-users-fje2brrt8yy.herokuapp.com/sellStock/", requestOptions)
+        .then(response => response.text())
+        .then(result => console.log(result))
+        .catch(error => console.log('error', error));
+
+        window.location.reload();
+
     }
 
     // render()
@@ -233,7 +266,7 @@ const Trading = () => {
                                         </Col>
                                         <Col>
                                         <h6>Price</h6>
-                                        <Form.Control placeholder="$4383.33" onChange={(e) => setMoney(e.target.value) }/>
+                                        <Form.Control placeholder="$0.0" onChange={(e) => setMoney(e.target.value) }/>
                                         </Col>
                                     </Form.Row>
                                     <Row>
@@ -243,7 +276,7 @@ const Trading = () => {
 
                                         </Col>
                                         <Col>
-                                            <Button variant="danger" size="lg" block>Sell</Button>  
+                                            <Button variant="danger" onClick={(e) => onSell(e)}  size="lg" block>Sell</Button>  
                                         </Col>
                                     </Row>
                                 </Form>
