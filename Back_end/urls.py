@@ -41,5 +41,7 @@ urlpatterns = [
     path('BuyOption/', userViews.BuyOption),
     path('test/', userViews.testlmit),
     path('makestock/', userViews.makeStock),
-    
+    path('getPrice/', userViews.GetYahooPrice),
+    path('getData/', userViews.GetYahooData),
+    path('getYahooOptions/', userViews.GetYahooOptions),
 ]
