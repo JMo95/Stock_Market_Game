@@ -259,7 +259,8 @@ def getUser(request):
     
     
 def getStockPrice(symbol):
-    return FakeStock.objects.filter(Symbol=symbol).values("Price")[0]["Price"]
+    detials = list(scrape_stock(symbol))
+    return float(detials[6])
 
 def BuyOption(request):
     Cuser = authenticateUser(request.headers.get('Authorization'))
