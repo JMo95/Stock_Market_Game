@@ -88,7 +88,7 @@ const BootstrapNavbar = () => {
                                 <Navbar.Collapse id="basic-navbar-nav">
                                     <Nav className="mr-auto">
                                     <Nav.Link href="/">Home</Nav.Link>
-                                    <Nav.Link href="/search">Search</Nav.Link>
+                                    <Nav.Link href="/Find/aapl">Search</Nav.Link>
                                     <Nav.Link href="/Trading">Trade</Nav.Link>
                                     </Nav>
                                     <Nav>
