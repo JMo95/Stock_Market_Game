@@ -293,7 +293,7 @@ def GetYahooData(request):
             
         Symbol = request.GET.get("symbol")
         detials = list(scrape_stock(Symbol))
-        detailsjson = {"low range" : detials[0],"high range" : detials[1],"volume" : detials[2],"avg volume" : detials[3],"market cap" : detials[4],"P/E" : detials[5], "price" : detials[6]}
+        detailsjson = {"lowrange" : detials[0],"highrange" : detials[1],"volume" : detials[2],"avgvolume" : detials[3],"marketcap" : detials[4],"PE" : detials[5], "price" : detials[6]}
         return JsonResponse(detailsjson,safe=False)
     
 def GetYahooPrice(request):
