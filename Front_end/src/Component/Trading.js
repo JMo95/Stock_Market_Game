@@ -18,6 +18,7 @@ const Trading = () => {
     const [quantity, setQuantity] = useState('')
     const [loading, setLoading] = useState(true);
     const [errors, setErrors] = useState(false);
+    const [reload, setReload] = useState(false);
 
     
   
@@ -121,6 +122,7 @@ const Trading = () => {
 
     function onSucess(e)
     {
+        setReload(false)
         console.log("Sucess happen on the user: ", username)
         console.log("This is stock name: ", stock_name)
         console.log("This is quantity: ", quantity)
@@ -144,15 +146,26 @@ const Trading = () => {
 
         fetch("https://stock-pipeli-users-fje2brrt8yy.herokuapp.com/addstock/", requestOptions)
         .then(response => response.text())
-        .then(result => console.log(result))
-        .catch(error => console.log('error', error));
+        .then(function(result){ 
+            console.log(result)
+            setReload(true)
+        })
+        .catch(function(error){
+            console.log(' there is an error', error)
+            setErrors(true)
+        });
 
-        window.location.reload();
+        if (reload)
+        {
+            window.location.reload();
+        }
 
     }
 
     function onSell(e)
     {
+        setReload(false)
+        console.log("SELL SHOUULD HAPPEN ")
         console.log("Sucess happen on the user: ", username)
         console.log("This is stock name: ", stock_name)
         console.log("This is quantity: ", quantity)
@@ -175,10 +188,20 @@ const Trading = () => {
 
         fetch("https://stock-pipeli-users-fje2brrt8yy.herokuapp.com/sellStock/", requestOptions)
         .then(response => response.text())
-        .then(result => console.log(result))
-        .catch(error => console.log('error', error));
+        .then(function(result) {
+            console.log(result)
+            setReload(true)
+        })
+        .catch(function(error) {
+            console.log('error', error)
+            setReload(false)
+            setErrors(true)
+        });
 
-        window.location.reload();
+        if(reload)
+        {
+            window.location.reload();
+        }
 
     }
 
@@ -194,7 +217,6 @@ const Trading = () => {
                 <div> 
                     <Container>
                         <Row>
-                            <p>User Test</p>
                             <p> </p>
                             <Col><h4>Balance: ${money}</h4></Col>
                             <Col></Col>
@@ -207,47 +229,15 @@ const Trading = () => {
                                 <h2>Your Stock List</h2>
                                 <p className="mt-5"></p>
                                 < Stocks />
-                                {/* <Table striped hover>
-                                <thread>
-                                    <tr>
-                                        <th>Symbol</th>
-                                        <th>Name</th>
-                                        <th>Price</th>
-                                        <th>Quantity</th>
-                                    </tr>
-                                <tbody>
-                                    <tr>
-                                        <th>GME</th>
-                                        <th>Gamestop</th>
-                                        <th>$349.22</th>
-                                        <th>233</th>
-                                    </tr>
-                                    <tr>
-                                        <th>AMC</th>
-                                        <th>AMC Entertainment</th>
-                                        <th>$49.22</th>
-                                        <th>2333</th>
-                                    </tr>
-                                    <tr>
-                                        <th>RKT</th>
-                                        <th>RKT Mortgage</th>
-                                        <th>$33.22</th>
-                                        <th>213</th>
-                                    </tr>
-                                    <tr>
-                                        <th>TLRY</th>
-                                        <th>Tilray</th>
-                                        <th>$19.85</th>
-                                        <th>42</th>
-                                    </tr>
-                                </tbody>
-                                </thread>
-                                </Table> */}
                             </Col>
                             <Col xs={6}>
                                 <h2> Buy/Sell</h2>
                                 <p className="mt-4"></p>
                                 <Form>
+                                    {errors == true?
+                                    <div>Wrong input</div>
+                                :
+                                    <div></div>}
                                     <Form.Row>
                                         <Col xs={6}>
 
@@ -264,10 +254,10 @@ const Trading = () => {
                                         <h6>Quantity</h6>
                                         <Form.Control placeholder="Qty..."  onChange={(e) => setQuantity(e.target.value) }/>
                                         </Col>
-                                        <Col>
+                                        {/* <Col>
                                         <h6>Price</h6>
                                         <Form.Control placeholder="$0.0" onChange={(e) => setMoney(e.target.value) }/>
-                                        </Col>
+                                        </Col> */}
                                     </Form.Row>
                                     <Row>
                                         <Col>

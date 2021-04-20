@@ -34,13 +34,6 @@ const User = () => {
       redirect: 'follow'
     };
 
-    var tomato = {
-      "money": 0,
-      "user__email": "",
-      "user__username": "",
-    };
-    
-
     
     fetch("https://stock-pipeli-users-fje2brrt8yy.herokuapp.com/getuser/", requestOptions)
     .then(response => response.json())

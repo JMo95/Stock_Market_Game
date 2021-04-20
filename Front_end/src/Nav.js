@@ -11,71 +11,45 @@ import {
 const BootstrapNavbar = () => {
 
     const [isAuth, setIsAuth] = useState(false);
+    const [email, setEmail] = useState("");
+    const [money, setMoney] = useState(0);
+    const [username, setUsername] = useState("");
+    const [errorrs, setErrors] = useState(false);
   
     useEffect(() => {
       if (localStorage.getItem('token') !== null) {
         setIsAuth(true);
       }
+    var myHeaders = new Headers();
+    var bearer = "bearer "
+    // console.log("This is my bearer: ", bearer)
+    bearer += localStorage.getItem('token')
+    // console.log("This is my bearer: ", bearer)
+    myHeaders.append("Authorization", bearer);
+
+    var requestOptions = {
+      method: 'GET',
+      headers: myHeaders,
+      redirect: 'follow'
+    };
+
+    
+    fetch("https://stock-pipeli-users-fje2brrt8yy.herokuapp.com/getuser/", requestOptions)
+    .then(response => response.json())
+    .then(function(result){
+      setUsername(result[0].user__username)
+      setEmail(result[0].user__email)
+      setMoney(result[0].money)
+
+     } )
+    .catch(function(error){
+       console.log('error', error) 
+       localStorage.clear()
+        setErrors(true)
+      });
+
     }, []);
 
-
-  // function handle_Change(event)
-  //  {
-  //     console.log("Opertion4");
-  //     this.setState( (state, props) =>{
-  //       return{
-  //         search_A: event.target.value
-  //       };
-  //     }
-  //     )
-  //     console.log(this.state.search_A)
-  //     this.props.search_F(this.state.search_A);
-  // }
-
-
-  // function handleSubmit(event)
-  //  {
-  //   event.preventDefault();
-  //     console.log("Submit happen");
-  //     console.log(this.state.search_A);
-  //     this.props.search_F(this.state.search_A);
-  //     alert('A value was submitted: ' + this.state.search_A);
-  //     window.location.href = '/search';
-  // }
-
-
-  // function handleClick_landing()
-  //   {
-  //     console.log("Opertion");
-  //     window.location.href = '/Landing';
-  //   }
-
-  //   function handleClick_Search()
-  //   {
-  //     console.log("Opertion2");
-  //     // this.props.search_F("megaman");
-  //     // console.log(this.props.search_F2);
-  //     window.location.href = '/search';
-  //   }
-
-    // function handleClick_User()
-    // {
-    //   console.log("Opertion3");
-    //   if (this.state.user_hello === true)
-    //   {
-    //       this.setState({
-    //         user_hello: false
-    //       })
-    //   }
-    //   else
-    //   {
-    //     this.setState({
-    //       user_hello: true
-    //     })
-    //   }
-    //   //window.location.href = '/user';
-    //   // console.log("this is boolean: ", this.state.user_hello);
-    // }
     
         return(
             <div>
@@ -103,7 +77,7 @@ const BootstrapNavbar = () => {
                                     {isAuth === true?
                                       ( 
                                         <Nav className="ml-auto pr-5">
-                                        <NavDropdown title="User" id="basic-nav-dropdown" className = "pr-5">
+                                        <NavDropdown title={username} id="basic-nav-dropdown" className = "pr-5">
                                             <NavDropdown.Item href="/User">User Info</NavDropdown.Item>
                                             <NavDropdown.Item href="/auth/Logout">Log Out</NavDropdown.Item>
                                         </NavDropdown>
