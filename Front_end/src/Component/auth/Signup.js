@@ -70,7 +70,7 @@ const Signup = () => {
           <header className="App-header">
           <div className="reg_box">
                 {loading === false && <h1 className="reg_text0" >Signup</h1>}
-                {errors === true && <h2 className="reg_text0" >Cannot signup with provided credentials</h2>}
+                {errors === true && <h2 className="reg_box_text0" >Cannot signup with provided credentials</h2>}
                 <form onSubmit={onSubmit}>
                         {/* <label htmlFor='email'>Email address:</label> <br /> */}
                         <div className="reg_box2">
