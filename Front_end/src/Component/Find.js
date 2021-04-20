@@ -15,12 +15,14 @@ useEffect(() => {
     axios.get(url)
     .then(response => {
         setToken(response.data)
+        console.log(response.data)
     })
 }, [url])
 
 const handleHistory = (evt) => {
-    history.push(`/find/${symbol}`)
+    history.push(`/find/${token}`)
 }
+
 
 if(token){
     return (
@@ -33,9 +35,12 @@ if(token){
         <Row>
             <Col xs={4}></Col>
             <Col xs={4}>
-            <form>
-            <Form.Control size="lg" type="search" placeholder="Search a stock name or symbol"
-            
+            <form
+             value={token}
+             onChange={(e) => setToken(e.target.value)} onSubmit={handleHistory}>
+             
+            <Form.Control size="lg" type="search" placeholder="Search a stock symbol..."
+           
              />
              </form>
             </Col>
@@ -49,21 +54,27 @@ if(token){
             <Col xs={4}></Col>
             <Col xs={4}>
 
+                
             <Table striped bordered hover>
             <thead>
                 <tr>
                 <th>Ticker</th>
-                <th>Name</th>
                 <th>Price</th>
                 <th>Volume</th>
+                <th>Avg. Volume</th>
+                <th>Market Cap</th>
+                <th>P/E Ratio</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                 <td>{symbol.toUpperCase()}</td>
-                <td>{token.lowRange}</td>
-                <td>{token.price}</td>
+                <td>${token.price}</td>
                 <td>{token.volume}</td>
+                <td>{token.avgvolume}</td>
+                <td>{token.marketcap}</td>
+                <td>{token.PE}</td>
+                
              
              
                 </tr>
